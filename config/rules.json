@@ -1,0 +1,19 @@
+[
+  {
+    "name": "Viettel Post Invoice",
+    "enabled": true,
+    "subject_query": "Tổng công ty Cổ phần Bưu Chính Viettel",
+    "sender_filter": "",
+    "label_filter": "INBOX",
+    "output_folder": "D:/TOOL AI/TOOL_AUTO_DOWNLOAD_VAT/viettel_post",
+    "download_attachments": true,
+    "download_bang_ke": true,
+    "max_emails": 50,
+    "attachment_extensions": [
+      ".pdf",
+      ".xml",
+      ".xlsx",
+      ".zip"
+    ]
+  }
+]

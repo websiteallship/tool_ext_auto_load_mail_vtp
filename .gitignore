@@ -1,0 +1,33 @@
+# Credentials
+.env
+credentials.json
+token.json
+*.pem
+*.key
+
+# Downloads & Logs
+downloads/
+logs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.spec
+
+# Virtual Environment
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+.DS_Store

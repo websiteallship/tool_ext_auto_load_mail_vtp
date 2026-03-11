@@ -1,0 +1,9 @@
+{
+  "output_dir": "D:/TOOL AI/TOOL_AUTO_DOWNLOAD_VAT/viettel_post",
+  "auto_schedule_enabled": false,
+  "schedule_interval_minutes": 30,
+  "skip_duplicates": true,
+  "mark_processed_label": "AutoDownloaded",
+  "auth_method": "oauth2",
+  "log_level": "INFO"
+}
