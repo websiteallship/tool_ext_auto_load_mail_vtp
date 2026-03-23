@@ -2,18 +2,40 @@
   {
     "name": "Viettel Post Invoice",
     "enabled": true,
+    "handler_type": "viettel_post",
     "subject_query": "Tổng công ty Cổ phần Bưu Chính Viettel",
-    "sender_filter": "",
+    "sender_filter": "ketoan.allship@gmail.com",
     "label_filter": "INBOX",
     "output_folder": "D:/TOOL AI/TOOL_AUTO_DOWNLOAD_VAT/viettel_post",
-    "download_attachments": true,
-    "download_bang_ke": true,
     "max_emails": 50,
-    "attachment_extensions": [
-      ".pdf",
-      ".xml",
-      ".xlsx",
-      ".zip"
-    ]
+    "description": "Hóa đơn + bảng kê chi tiết Viettel Post",
+    "icon": "📦",
+    "file_types": "📎 .pdf .xml .zip + 🔗 bảng kê HTML→xlsx"
+  },
+  {
+    "name": "J&T Express E-Invoice",
+    "enabled": true,
+    "handler_type": "jt_invoice",
+    "subject_query": "THUẬN PHONG: Thông báo phát hành hóa đơn",
+    "sender_filter": "ketoan.allship@gmail.com",
+    "label_filter": "INBOX",
+    "output_folder": "D:/TOOL AI/TOOL_AUTO_DOWNLOAD_VAT/jt_e_invoice",
+    "max_emails": 50,
+    "description": "Hóa đơn điện tử J&T Express (Thuận Phong)",
+    "icon": "📄",
+    "file_types": "🔗 .pdf + .xml (qua link redirect)"
+  },
+  {
+    "name": "J&T Express COD",
+    "enabled": true,
+    "handler_type": "jt_cod",
+    "subject_query": "[J&T] - Đối Soát COD",
+    "sender_filter": "ketoan.allship@gmail.com",
+    "label_filter": "INBOX",
+    "output_folder": "D:/TOOL AI/TOOL_AUTO_DOWNLOAD_VAT/jt_cod",
+    "max_emails": 50,
+    "description": "Bảng kê đối soát COD J&T Express",
+    "icon": "📊",
+    "file_types": "📎 .xlsx"
   }
 ]

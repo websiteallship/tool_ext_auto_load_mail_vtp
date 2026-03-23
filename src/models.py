@@ -148,13 +148,20 @@ class EmailRule:
     """An email processing rule — defines how to search and process emails."""
     name: str
     enabled: bool = True
+    handler_type: str = "generic"
     subject_query: str = ""
     sender_filter: str = ""
     label_filter: str = "INBOX"
-    output_folder: str = "downloads"
+    output_folder: str = ""
+    max_emails: int = 50
+    extraction_config: dict | None = None
+    # Display metadata (dev-configured, shown on GUI rule cards)
+    description: str = ""
+    icon: str = "📧"
+    file_types: str = ""
+    # Legacy fields (kept for backward compatibility)
     download_attachments: bool = True
     download_bang_ke: bool = True
-    max_emails: int = 50
     attachment_extensions: list[str] = field(
         default_factory=lambda: [".pdf", ".xml", ".xlsx"]
     )
@@ -168,26 +175,26 @@ class EmailRule:
             parts.append(f"from:{self.sender_filter}")
         if self.label_filter and self.label_filter.upper() != "ALL":
             parts.append(f"in:{self.label_filter.lower()}")
-        # Only filter by attachment if rule REQUIRES attachments
-        # (don't add if only downloading bảng kê links from body)
-        if self.download_attachments and not self.download_bang_ke:
-            parts.append("has:attachment")
         return " ".join(parts)
 
     def to_dict(self) -> dict:
         """Serialize to dictionary for JSON storage."""
-        return {
+        data = {
             "name": self.name,
             "enabled": self.enabled,
+            "handler_type": self.handler_type,
             "subject_query": self.subject_query,
             "sender_filter": self.sender_filter,
             "label_filter": self.label_filter,
             "output_folder": self.output_folder,
-            "download_attachments": self.download_attachments,
-            "download_bang_ke": self.download_bang_ke,
             "max_emails": self.max_emails,
-            "attachment_extensions": self.attachment_extensions,
+            "description": self.description,
+            "icon": self.icon,
+            "file_types": self.file_types,
         }
+        if self.extraction_config:
+            data["extraction_config"] = self.extraction_config
+        return data
 
     @classmethod
     def from_dict(cls, data: dict) -> EmailRule:
@@ -195,13 +202,19 @@ class EmailRule:
         return cls(
             name=data.get("name", "Unnamed"),
             enabled=data.get("enabled", True),
+            handler_type=data.get("handler_type", "generic"),
             subject_query=data.get("subject_query", ""),
             sender_filter=data.get("sender_filter", ""),
             label_filter=data.get("label_filter", "INBOX"),
-            output_folder=data.get("output_folder", "downloads"),
+            output_folder=data.get("output_folder", ""),
+            max_emails=data.get("max_emails", 50),
+            extraction_config=data.get("extraction_config"),
+            description=data.get("description", ""),
+            icon=data.get("icon", "📧"),
+            file_types=data.get("file_types", ""),
+            # Legacy compat
             download_attachments=data.get("download_attachments", True),
             download_bang_ke=data.get("download_bang_ke", True),
-            max_emails=data.get("max_emails", 50),
             attachment_extensions=data.get(
                 "attachment_extensions", [".pdf", ".xml", ".xlsx"]
             ),

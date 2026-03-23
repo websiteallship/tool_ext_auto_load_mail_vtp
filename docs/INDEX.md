@@ -1,8 +1,8 @@
 # Project Documentation Index
 
-## Email Auto-Download Tool — Viettel Post
+## Email Auto-Download Tool
 
-> Tài liệu nền tảng cho dự án tự động tải hóa đơn từ Gmail
+> Tài liệu nền tảng cho dự án tự động tải hóa đơn từ Gmail (multi-provider: VTP, J&T...)
 
 ---
 
@@ -16,6 +16,7 @@
 | [CORE_link_extractor.md](CORE_link_extractor.md) | HTML parsing, trích link bảng kê |
 | [CORE_file_downloader.md](CORE_file_downloader.md) | Download files, async batch, retry |
 | [CORE_rule_engine.md](CORE_rule_engine.md) | Multi-rule management, JSON config |
+| [CORE_handler_system.md](CORE_handler_system.md) | **NEW v2.0** — Plugin handler architecture, ExtractionConfig |
 
 ### 🏗️ ARCH — Kiến Trúc
 
@@ -28,9 +29,11 @@
 
 | File | Mô tả |
 |------|--------|
-| [FEATURE_gui_application.md](FEATURE_gui_application.md) | GUI wireframes, 4 tabs, threading model |
-| [FEATURE_scheduler.md](FEATURE_scheduler.md) | Auto-scheduling, state machine |
+| [FEATURE_gui_application.md](FEATURE_gui_application.md) | GUI wireframes, 4 tabs, per-rule run, CompletionDialog |
+| [FEATURE_scheduler.md](FEATURE_scheduler.md) | Auto-scheduling, run_rules(), state machine |
 | [FEATURE_roadmap.md](FEATURE_roadmap.md) | Roadmap v1.0 → v2.0 |
+| [USER_GUIDE_vi.md](USER_GUIDE_vi.md) | **📖 Hướng dẫn sử dụng (tiếng Việt)** |
+| [CHANGELOG.md](CHANGELOG.md) | Lịch sử thay đổi theo phiên bản |
 
 ### 📐 SPECS — Tiêu Chuẩn Kỹ Thuật
 

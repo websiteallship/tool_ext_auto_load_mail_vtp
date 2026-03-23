@@ -5,6 +5,62 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ---
 
+## [2.1.0] — PLANNED
+
+### Added
+- 👁️ **Dry-Run Preview** — quét email và hiện danh sách file dự kiến (không tải)
+  - PreviewDialog: bảng email + file, nút "Tải ngay"
+  - `preview_rules()` method trên Scheduler
+- 📋 **Download History** — lịch sử file đã tải, lọc theo rule
+  - HistoryDialog: bảng file, filter rule, xóa lịch sử
+  - `DownloadHistory` class: JSON storage, stats API
+- 🔽 **System Tray** — minimize xuống tray, menu Mở/Chạy/Dừng/Thoát
+  - `pystray` integration, tray icon thread riêng
+- 🔔 **Toast Notification** — Windows notification khi tải xong + app minimize
+- 🚀 **Windows Startup** — checkbox tự khởi động cùng Windows
+- ⏱️ **Countdown Timer** — đếm ngược tới lần chạy tiếp (auto-schedule)
+- 📊 **Stats Summary Card** — "Hôm nay: 12 | Tuần: 45 | Tổng: 230"
+
+---
+
+## [2.0.0] — 2026-03-23
+
+### Added
+- 🔌 **Plugin Handler Architecture** — mỗi nhà cung cấp = 1 handler độc lập
+  - `BaseEmailHandler` + `ExtractionConfig` (2-tier: data + code)
+  - `ViettelPostHandler` — refactor logic VTP hiện có
+  - `JTInvoiceHandler` — J&T E-Invoice: follow redirect → PDF/XML
+  - `JTCODHandler` — J&T COD: tải attachment .xlsx
+  - `GenericHandler` — handler mặc định
+  - Handler Registry + factory pattern
+- 📂 **Auto-subfolder theo tháng** — dựa vào ngày email → `{YYYYMM}/` subfolder
+- 📁 **Per-rule output folder** — mỗi rule có folder picker riêng
+- 🎯 **Per-rule run** — chọn chạy 1 rule cụ thể hoặc tất cả rule đang bật
+  - Dropdown "Chạy rule" trên Dashboard
+  - Rule tắt hiện `✗ (TẮT)`, chọn sẽ báo phải enable trước
+  - `Scheduler.run_rules(rules)` — API mới hỗ trợ chạy rule chỉ định
+- 📂 **Smart Open Folder** — dropdown hiện folder riêng của từng rule
+  - Tự sync khi chuyển tab hoặc toggle rule
+- 📊 **CompletionDialog nâng cấp** — per-rule folder buttons
+  - Chạy 1 rule → 1 nút mở đúng folder rule đó
+  - Chạy nhiều rule → nhiều nút, mỗi rule 1 nút với icon+tên+folder
+  - Nút folder luôn hiện kể cả khi tất cả file trùng (skip)
+  - Dialog hiển thị chính giữa màn hình
+- 🔄 **Tab change sync** — tự reload rules.json khi chuyển tab Dashboard/Rules
+- 🛡️ **Error isolation** — 1 rule lỗi không ảnh hưởng rule khác
+- 🔀 **Follow redirect** — hỗ trợ tracking URL (J&T)
+- 🌐 **Dynamic allowed domains** — mỗi handler khai báo domains riêng
+- 🧪 **80 unit tests** — 36 handler tests + 44 existing tests
+
+### Changed
+- 🎨 **Rules Tab redesign** — rule cards với switch + description + file types badge
+- ❌ **Bỏ user rule creation** — rules do dev cấu hình, user chỉ toggle + chọn folder
+- 🗑️ **Bỏ RuleDialog** — không cần add/edit/delete UI nữa
+- 🔄 **run_once() refactor** — delegate sang run_rules() (backward compatible)
+- 🇻🇳 **Vietnamese localization** — dialog, thông báo, label bằng tiếng Việt
+
+---
+
 ## [1.1.0] — 2026-03-11
 
 ### Added
@@ -38,21 +94,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - 📦 Build thành 1 file .exe portable (~44 MB) qua PyInstaller
 - 🧪 44 unit tests (file_downloader, link_extractor, rule_engine)
 
-### Changed
-- 🗑️ Loại bỏ tab History — gộp vào Dashboard
-- 📂 Gộp thư mục tải — dùng chung 1 download folder thay vì per-rule
-
 ---
 
 ## [0.0.1] — 2026-03-10
 
 ### Added
 - 📋 Project foundation documentation (17 files in `docs/`)
-  - CORE: gmail_client, link_extractor, file_downloader, rule_engine
-  - ARCH: system_architecture, data_flow
-  - FEATURE: gui_application, scheduler, roadmap
-  - SPECS: security_credentials, error_handling, dependencies, testing_strategy, coding_standards
-  - OPS: build_packaging, logging_monitoring
 - 🛠️ Agent skills installed (11 skills in `.agent/skills/`)
-- 📏 Agent rules defined (8 rules in `.agent/rules/`)
 - 📐 Implementation plan created

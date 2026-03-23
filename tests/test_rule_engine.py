@@ -115,8 +115,8 @@ class TestToGmailQuery:
         assert "from:test@example.com" in query
         assert "in:inbox" in query
 
-    def test_has_attachment_only_when_no_bang_ke(self):
-        """has:attachment is only added when downloading attachments but NOT bang_ke."""
+    def test_query_without_has_attachment(self):
+        """to_gmail_query no longer adds has:attachment (handlers decide)."""
         rule = EmailRule(
             name="Test",
             subject_query="Hello",
@@ -124,7 +124,8 @@ class TestToGmailQuery:
             download_bang_ke=False,
         )
         query = rule.to_gmail_query()
-        assert "has:attachment" in query
+        assert "has:attachment" not in query
+        assert 'subject:"Hello"' in query
 
     def test_no_has_attachment_when_both(self):
         """When both attachments and bang_ke are enabled, omit has:attachment."""

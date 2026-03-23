@@ -122,7 +122,7 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("Email Auto-Download Tool")
+        self.title("Email Auto-Download Tool v2.0.0")
         self.geometry("960x680")
         self.minsize(860, 580)
 
@@ -183,6 +183,9 @@ class App(ctk.CTk):
         for tab in (self.tab_dashboard, self.tab_rules, self.tab_settings, self.tab_help):
             tab.configure(fg_color=Colors.CARD)
 
+        # Refresh Dashboard dropdowns whenever user switches tabs
+        self.tabview.configure(command=self._on_tab_changed)
+
     # ── Dashboard Tab ────────────────────────────────────────────────
 
     def _build_dashboard_tab(self) -> None:
@@ -239,20 +242,25 @@ class App(ctk.CTk):
         )
         self.btn_reset.pack(side="left", padx=(0, 6))
 
-        ctk.CTkButton(
+        self.folder_menu = ctk.CTkOptionMenu(
             top_frame,
-            text="📂  Open Folder",
-            command=self._on_open_folder,
-            width=130,
+            width=160,
             height=34,
             fg_color=Colors.CARD,
-            hover_color=Colors.LOG_BG,
-            border_width=1,
-            border_color=Colors.BORDER,
+            button_color=Colors.SIDEBAR,
+            button_hover_color=Colors.BORDER,
             text_color=Colors.TEXT,
-            font=("", 13),
+            dropdown_fg_color=Colors.CARD,
+            dropdown_text_color=Colors.TEXT,
+            dropdown_hover_color=Colors.SIDEBAR,
+            font=("", 12),
             corner_radius=6,
-        ).pack(side="left", padx=(0, 8))
+            values=["📂 Open Folder"],
+            command=self._on_open_folder,
+        )
+        self.folder_menu.set("📂 Open Folder")
+        self.folder_menu.pack(side="left", padx=(0, 8))
+        self._update_folder_menu()
 
         # Status indicator
         self.lbl_status = ctk.CTkLabel(
@@ -272,7 +280,46 @@ class App(ctk.CTk):
         )
         self.lbl_last_run.pack(side="right")
 
-        # ── Progress bar ─────────────────────────
+        # ── Rule selector row ─────────────────────
+        selector_frame = ctk.CTkFrame(tab, fg_color="transparent")
+        selector_frame.pack(fill="x", padx=12, pady=(0, 6))
+
+        ctk.CTkLabel(
+            selector_frame,
+            text="Chạy rule:",
+            font=("", 12, "bold"),
+            text_color=Colors.TEXT,
+        ).pack(side="left", padx=(0, 8))
+
+        self.rule_selector = ctk.CTkOptionMenu(
+            selector_frame,
+            width=350,
+            height=32,
+            fg_color=Colors.LOG_BG,
+            button_color=Colors.SIDEBAR,
+            button_hover_color=Colors.BORDER,
+            text_color=Colors.TEXT,
+            dropdown_fg_color=Colors.CARD,
+            dropdown_text_color=Colors.TEXT,
+            dropdown_hover_color=Colors.SIDEBAR,
+            font=("", 12),
+            corner_radius=6,
+            values=["▶ Tất cả rule đang bật"],
+        )
+        self.rule_selector.set("▶ Tất cả rule đang bật")
+        self.rule_selector.pack(side="left", padx=(0, 8))
+
+        # Populate rule selector with enabled rules
+        self._update_rule_selector()
+
+        # Summary label
+        self.lbl_summary = ctk.CTkLabel(
+            selector_frame,
+            text="",
+            font=("", 11),
+            text_color=Colors.TEXT_MUTED,
+        )
+        self.lbl_summary.pack(side="right")
         progress_frame = ctk.CTkFrame(tab, fg_color="transparent")
         progress_frame.pack(fill="x", padx=12, pady=(0, 4))
 
@@ -318,49 +365,42 @@ class App(ctk.CTk):
         stats_frame = ctk.CTkFrame(tab, fg_color="transparent")
         stats_frame.pack(fill="x", padx=12, pady=(0, 8))
 
-        self.lbl_summary = ctk.CTkLabel(
+        self.lbl_stats_summary = ctk.CTkLabel(
             stats_frame,
-            text="Ready — click Run Now to start.",
+            text="Ready — chọn rule rồi bấm Run Now.",
             font=("", 12),
             text_color=Colors.TEXT_MUTED,
         )
-        self.lbl_summary.pack(side="left")
+        self.lbl_stats_summary.pack(side="left")
 
 
 
-    # ── Rules Tab ────────────────────────────────────────────────────
+    # ── Rules Tab (v2.0 — Dev-configured) ─────────────────────────────
 
     def _build_rules_tab(self) -> None:
+        """Build Rules tab — dev-configured rules with switch + folder picker."""
         tab = self.tab_rules
 
-        # Buttons
-        btn_frame = ctk.CTkFrame(tab, fg_color="transparent")
-        btn_frame.pack(fill="x", padx=12, pady=(12, 8))
+        # Header explanation
+        header = ctk.CTkFrame(
+            tab, fg_color="#EBF8FF", corner_radius=10,
+            border_color="#BEE3F8", border_width=1,
+        )
+        header.pack(fill="x", padx=12, pady=(12, 8))
 
-        ctk.CTkButton(
-            btn_frame,
-            text="+ Add Rule",
-            command=self._on_add_rule,
-            width=120,
-            height=36,
-            fg_color=Colors.PRIMARY,
-            hover_color=Colors.PRIMARY_HOVER,
-            font=("", 13, "bold"),
-            corner_radius=8,
-        ).pack(side="left", padx=(0, 8))
+        ctk.CTkLabel(
+            header,
+            text="📧  Chọn loại email cần tải",
+            font=("", 15, "bold"),
+            text_color=Colors.PRIMARY,
+        ).pack(anchor="w", padx=16, pady=(10, 2))
 
-        ctk.CTkButton(
-            btn_frame,
-            text="↻ Refresh",
-            command=self._refresh_rules_list,
-            width=100,
-            height=36,
-            fg_color=Colors.SIDEBAR,
-            hover_color=Colors.BORDER,
-            text_color=Colors.TEXT,
-            font=("", 13),
-            corner_radius=8,
-        ).pack(side="left")
+        ctk.CTkLabel(
+            header,
+            text="Bật/tắt rule bạn muốn, chọn thư mục lưu. Bấm Run Now ở Dashboard khi sẵn sàng.",
+            font=("", 12),
+            text_color=Colors.TEXT_MUTED,
+        ).pack(anchor="w", padx=16, pady=(0, 10))
 
         # Rules list
         self.rules_scroll = ctk.CTkScrollableFrame(
@@ -372,106 +412,184 @@ class App(ctk.CTk):
         )
         self.rules_scroll.pack(fill="both", expand=True, padx=12, pady=(0, 12))
 
+        # Store references to folder entries per rule
+        self._rule_folder_entries: dict[str, ctk.CTkEntry] = {}
+
         self._refresh_rules_list()
 
     def _refresh_rules_list(self) -> None:
-        """Rebuild rules display."""
+        """Rebuild rules display — dev-configured rule cards."""
         for widget in self.rules_scroll.winfo_children():
             widget.destroy()
+        self._rule_folder_entries.clear()
+
+        # Sync Dashboard rule selector dropdown
+        if hasattr(self, "rule_selector"):
+            self._update_rule_selector()
+        if hasattr(self, "folder_menu"):
+            self._update_folder_menu()
 
         if not self.rule_engine.rules:
             ctk.CTkLabel(
                 self.rules_scroll,
-                text="No rules configured. Click '+ Add Rule' to get started.",
+                text="Chưa có rule nào được cấu hình.\n"
+                     "Liên hệ quản trị viên để thêm rule.",
                 text_color=Colors.TEXT_MUTED,
                 font=("", 13),
+                justify="center",
             ).pack(pady=40)
             return
+
+        # Count enabled
+        enabled_count = sum(1 for r in self.rule_engine.rules if r.enabled)
+        total_count = len(self.rule_engine.rules)
+
+        # Summary bar
+        summary_frame = ctk.CTkFrame(self.rules_scroll, fg_color="transparent")
+        summary_frame.pack(fill="x", padx=4, pady=(4, 8))
+        ctk.CTkLabel(
+            summary_frame,
+            text=f"Đang bật {enabled_count}/{total_count} rule",
+            font=("", 12, "bold"),
+            text_color=Colors.SUCCESS if enabled_count > 0 else Colors.TEXT_MUTED,
+        ).pack(side="left")
 
         for rule in self.rule_engine.rules:
             self._create_rule_card(rule)
 
     def _create_rule_card(self, rule: EmailRule) -> None:
-        """Create a card widget for a rule."""
+        """Create a modern rule card with switch, description, and folder picker."""
+        # Card border color indicates active/inactive
+        border_color = Colors.PRIMARY if rule.enabled else Colors.BORDER
+        card_bg = Colors.CARD if rule.enabled else "#FAFBFC"
+
         card = ctk.CTkFrame(
             self.rules_scroll,
-            corner_radius=8,
-            fg_color=Colors.CARD,
-            border_color=Colors.BORDER,
-            border_width=1,
+            corner_radius=10,
+            fg_color=card_bg,
+            border_color=border_color,
+            border_width=2 if rule.enabled else 1,
         )
-        card.pack(fill="x", pady=4, padx=4)
+        card.pack(fill="x", pady=5, padx=4)
 
-        # Header
-        header = ctk.CTkFrame(card, fg_color="transparent")
-        header.pack(fill="x", padx=12, pady=(10, 4))
+        # ── Row 1: Icon + Name + Switch ────────────────────────────
+        row1 = ctk.CTkFrame(card, fg_color="transparent")
+        row1.pack(fill="x", padx=14, pady=(12, 0))
 
-        status_icon = "●" if rule.enabled else "○"
-        status_color = Colors.SUCCESS if rule.enabled else Colors.TEXT_MUTED
+        # Icon (from rule metadata or handler)
+        icon = rule.icon if rule.icon else "📧"
         ctk.CTkLabel(
-            header,
-            text=f"{status_icon}  {rule.name}",
-            font=("", 14, "bold"),
-            text_color=status_color,
+            row1, text=icon, font=("", 22), width=32,
+        ).pack(side="left", padx=(0, 8))
+
+        # Rule name
+        name_color = Colors.TEXT if rule.enabled else Colors.TEXT_MUTED
+        ctk.CTkLabel(
+            row1,
+            text=rule.name,
+            font=("", 15, "bold"),
+            text_color=name_color,
         ).pack(side="left")
 
-        # Buttons (right → left: Delete, Edit, Toggle)
-        ctk.CTkButton(
-            header,
-            text="Delete",
-            width=65,
-            height=28,
-            fg_color=Colors.DANGER,
-            hover_color=Colors.DANGER_HOVER,
-            font=("", 11),
-            corner_radius=6,
-            command=lambda n=rule.name: self._on_delete_rule(n),
-        ).pack(side="right", padx=2)
-
-        ctk.CTkButton(
-            header,
-            text="Edit",
+        # ON/OFF switch (large, easy to tap)
+        switch_var = ctk.BooleanVar(value=rule.enabled)
+        switch = ctk.CTkSwitch(
+            row1,
+            text="BẬT" if rule.enabled else "TẮT",
+            variable=switch_var,
+            onvalue=True,
+            offvalue=False,
+            fg_color=Colors.BORDER,
+            progress_color=Colors.SUCCESS,
+            button_color=Colors.CARD,
+            button_hover_color=Colors.SIDEBAR,
+            text_color=Colors.SUCCESS if rule.enabled else Colors.TEXT_MUTED,
+            font=("", 12, "bold"),
             width=60,
-            height=28,
-            fg_color=Colors.WARNING,
-            hover_color=Colors.WARNING_HOVER,
-            font=("", 11),
-            corner_radius=6,
-            command=lambda r=rule: self._on_edit_rule(r),
-        ).pack(side="right", padx=2)
-
-        toggle_text = "Disable" if rule.enabled else "Enable"
-        toggle_color = Colors.SIDEBAR if rule.enabled else Colors.SUCCESS
-        toggle_hover = Colors.BORDER if rule.enabled else Colors.SUCCESS_HOVER
-        toggle_text_color = Colors.TEXT if rule.enabled else "#FFFFFF"
-        ctk.CTkButton(
-            header,
-            text=toggle_text,
-            width=70,
-            height=28,
-            fg_color=toggle_color,
-            hover_color=toggle_hover,
-            text_color=toggle_text_color,
-            font=("", 11),
-            corner_radius=6,
-            command=lambda r=rule: self._on_toggle_rule(r),
-        ).pack(side="right", padx=2)
-
-        # Details
-        details = ctk.CTkFrame(card, fg_color="transparent")
-        details.pack(fill="x", padx=12, pady=(0, 10))
-
-        info = (
-            f"Subject: {rule.subject_query or '(any)'}    |    "
-            f"From: {rule.sender_filter or '(any)'}"
+            command=lambda r=rule, sv=switch_var: self._on_toggle_rule(r, sv),
         )
+        switch.pack(side="right", padx=(8, 0))
+
+        # ── Row 2: Description + file types badge ──────────────────
+        row2 = ctk.CTkFrame(card, fg_color="transparent")
+        row2.pack(fill="x", padx=14, pady=(4, 0))
+
+        desc = rule.description or "Không có mô tả"
         ctk.CTkLabel(
-            details,
-            text=info,
-            font=("", 11),
+            row2,
+            text=desc,
+            font=("", 12),
             text_color=Colors.TEXT_MUTED,
-            justify="left",
-        ).pack(anchor="w")
+        ).pack(side="left")
+
+        # File types badge
+        if rule.file_types:
+            badge_frame = ctk.CTkFrame(
+                row2, fg_color="#EDF2F7", corner_radius=6,
+            )
+            badge_frame.pack(side="right")
+            ctk.CTkLabel(
+                badge_frame,
+                text=rule.file_types,
+                font=("", 10),
+                text_color=Colors.TEXT_MUTED,
+            ).pack(padx=8, pady=2)
+
+        # ── Row 3: Folder picker ───────────────────────────────────
+        row3 = ctk.CTkFrame(card, fg_color="transparent")
+        row3.pack(fill="x", padx=14, pady=(8, 0))
+
+        ctk.CTkLabel(
+            row3,
+            text="📁 Lưu vào:",
+            font=("", 12, "bold"),
+            text_color=Colors.TEXT,
+        ).pack(side="left", padx=(0, 6))
+
+        folder_entry = ctk.CTkEntry(
+            row3,
+            width=380,
+            height=32,
+            fg_color=Colors.LOG_BG,
+            border_color=Colors.BORDER,
+            text_color=Colors.TEXT,
+            font=("", 11),
+            placeholder_text="Chọn thư mục lưu file...",
+        )
+        # Pre-fill with rule's output_folder or global setting
+        current_folder = rule.output_folder or self.settings.get("output_dir", "downloads")
+        folder_entry.insert(0, current_folder)
+        folder_entry.pack(side="left", padx=(0, 6))
+
+        self._rule_folder_entries[rule.name] = folder_entry
+
+        ctk.CTkButton(
+            row3,
+            text="Chọn...",
+            width=70,
+            height=32,
+            fg_color=Colors.SIDEBAR,
+            hover_color=Colors.BORDER,
+            text_color=Colors.TEXT,
+            font=("", 11),
+            corner_radius=6,
+            command=lambda r=rule, e=folder_entry: self._on_browse_rule_folder(r, e),
+        ).pack(side="left")
+
+        # ── Row 4: Auto-subfolder preview ──────────────────────────
+        row4 = ctk.CTkFrame(card, fg_color="transparent")
+        row4.pack(fill="x", padx=14, pady=(2, 10))
+
+        from datetime import datetime
+        month_str = datetime.now().strftime("%Y%m")
+        folder_name = Path(current_folder).name if current_folder else "..."
+        preview_text = f"📂 Cấu trúc: {folder_name}/{month_str}/file_name.pdf"
+        ctk.CTkLabel(
+            row4,
+            text=preview_text,
+            font=("", 10),
+            text_color=Colors.FOOTER,
+        ).pack(anchor="w", padx=(34, 0))
 
     # ── Settings Tab ─────────────────────────────────────────────────
 
@@ -682,7 +800,7 @@ class App(ctk.CTk):
         title_frame.pack(fill="x", pady=(0, 12))
 
         ctk.CTkLabel(
-            title_frame, text="📖  Hướng Dẫn Sử Dụng",
+            title_frame, text="📖  Hướng Dẫn Sử Dụng — v2.0",
             font=("", 20, "bold"), text_color=Colors.PRIMARY,
         ).pack(anchor="w", padx=16, pady=(14, 2))
 
@@ -703,26 +821,23 @@ class App(ctk.CTk):
         ])
 
         # Step 2
-        self._help_section(scroll, "Bước 2 — Thiết lập Rules (Quy tắc)", [
+        self._help_section(scroll, "Bước 2 — Bật rule và chọn thư mục lưu", [
             ("📋", "Vào tab Rules",
-             "Mỗi Rule là một bộ điều kiện để lọc email cần tải."),
-            ("➕", "Nhấn '+ Add Rule'",
-             "Điền thông tin:\n"
-             "  • Tên quy tắc: Đặt tên dễ nhận biết (vd: Hóa đơn Viettel Post).\n"
-             "  • Subject Query: Từ khóa tìm trong tiêu đề email.\n"
-             "  • Sender Filter: Email người gửi (bỏ trống = tất cả).\n"
-             "  • Output Folder: Thư mục lưu file tải về.\n"
-             "  • Tích chọn tải Attachment hoặc Bảng kê tùy nhu cầu."),
-            ("✏️", "Chỉnh sửa / Xóa Rule",
-             "Nhấn Edit để thay đổi, Delete để xóa.\n"
-             "Bật/tắt Rule bằng nút Enable / Disable."),
+             "Mỗi Rule đại diện cho 1 loại email cần tải (VTP, J&T...).\n"
+             "Rules đã được cấu hình sẵn — bạn chỉ cần bật/tắt."),
+            ("🔄", "Bật/Tắt rule",
+             "Gạt công tắc BẬT/TẮT bên phải mỗi rule.\n"
+             "Rule nào được bật sẽ chạy khi bấm Run Now."),
+            ("📁", "Chọn thư mục lưu",
+             "Nhấn 'Chọn...' để chọn thư mục lưu file cho từng rule.\n"
+             "File tải về sẽ tự động sắp xếp theo tháng (vd: 202603/)."),
         ])
 
         # Step 3
         self._help_section(scroll, "Bước 3 — Cài đặt thư mục & lịch tự động", [
-            ("📁", "Thư mục tải về",
+            ("📁", "Thư mục mặc định",
              "Vào Settings → mục Download Folder.\n"
-             "Nhấn Browse... để chọn thư mục mặc định lưu file."),
+             "Nhấn Browse... để chọn thư mục mặc định (dùng khi rule chưa chọn folder riêng)."),
             ("⏰", "Lịch tự động (Auto Schedule)",
              "Bật Enable automatic checking để ứng dụng tự chạy định kỳ.\n"
              "Đặt Interval (phút) — ví dụ 30 = kiểm tra email mỗi 30 phút."),
@@ -730,28 +845,36 @@ class App(ctk.CTk):
              "Nhấn Save Settings sau khi thay đổi."),
         ])
 
-        # Step 4
+        # Step 4 — Per-rule run
         self._help_section(scroll, "Bước 4 — Chạy và theo dõi", [
-            ("▶", "Chạy thủ công (Run Now)",
-             "Nhấn nút Run Now ở tab Dashboard.\n"
-             "Ứng dụng sẽ duyệt Gmail theo từng Rule và tải file về thư mục đã chọn."),
-            ("📊", "Theo dõi tiến trình",
+            ("🎯", "Chọn rule cần chạy",
+             "Trên Dashboard, dropdown 'Chạy rule' cho phép:\n"
+             "• Chọn 'Tất cả rule đang bật' → chạy tuần tự tất cả\n"
+             "• Chọn 1 rule cụ thể → chỉ chạy rule đó\n"
+             "⚠ Rule tắt hiện '✗ TẮT' — phải bật ở tab Rules trước."),
+            ("▶", "Bấm Run Now",
+             "Ứng dụng sẽ duyệt Gmail theo rule đã chọn.\n"
              "Thanh progress bar hiển thị tiến độ.\n"
              "Log hiển thị chi tiết từng bước xử lý."),
-            ("📂", "Mở thư mục",
-             "Nhấn Open Folder để mở thư mục tải về trong File Explorer."),
-            ("⏹", "Dừng",
+            ("⏹", "Dừng giữa chừng",
              "Nhấn Stop bất cứ lúc nào để dừng quá trình."),
         ])
 
-        # Step 5
-        self._help_section(scroll, "Bước 5 — Lịch sử & Reset", [
-            ("🗂️", "Tab History",
-             "Trong Dashboard → tab History:\n"
-             "Xem thống kê số file đã tải, bỏ qua, lỗi của từng lần chạy."),
+        # Step 5 — Folder & results
+        self._help_section(scroll, "Bước 5 — Xem kết quả & thư mục", [
+            ("📊", "Dialog hoàn tất",
+             "Sau khi chạy xong, dialog hiện:\n"
+             "• Số email, file đã tải, file bỏ qua (trùng)\n"
+             "• Chi tiết từng file (tên, trạng thái)\n"
+             "• Nút mở thư mục cho từng rule đã chạy."),
+            ("📂", "Mở folder bất kỳ lúc nào",
+             "Trên Dashboard, bấm '📂 Open Folder ▼' → chọn:\n"
+             "• Folder mặc định\n"
+             "• Folder riêng của từng rule (VTP, J&T...)\n"
+             "Click → mở folder trong File Explorer."),
             ("↻", "Reset lịch sử",
              "Nhấn Reset để xóa danh sách email đã xử lý.\n"
-             "⚠  Lần chạy tiếp theo sẽ tải lại TẤT CẢ email phù hợp."),
+             "⚠ Lần chạy tiếp theo sẽ tải lại TẤT CẢ email phù hợp."),
         ])
 
         # Important notes
@@ -771,7 +894,7 @@ class App(ctk.CTk):
             text=(
                 "• Không chia sẻ file credentials.json cho người khác.\n"
                 "• Token đăng nhập được lưu an toàn trong hệ thống (keyring).\n"
-                "• Ứng dụng chỉ tải file từ các domain đáng tin cậy (vinvoice.viettel.vn, ...).\n"
+                "• Ứng dụng chỉ tải file từ các domain đáng tin cậy.\n"
                 "• File trùng tên sẽ bỏ qua nếu tuỳ chọn 'Skip duplicates' được bật.\n"
                 "• Nhật ký đầy đủ được lưu tại: logs/app.log"
             ),
@@ -895,19 +1018,103 @@ class App(ctk.CTk):
         )
         self._queue_log("info", "Gmail disconnected")
 
-    # ── Run / Stop ───────────────────────────────────────────────────
+    def _on_tab_changed(self, tab_name: str) -> None:
+        """Refresh Dashboard data when user switches to it."""
+        if tab_name == "Dashboard":
+            # Reload rules from disk to pick up external edits
+            self.rule_engine.load_rules()
+            if hasattr(self, "rule_selector"):
+                self._update_rule_selector()
+            if hasattr(self, "folder_menu"):
+                self._update_folder_menu()
+        elif tab_name == "Rules":
+            # Reload rules from disk for Rules tab too
+            self.rule_engine.load_rules()
+            if hasattr(self, "rules_scroll"):
+                self._refresh_rules_list()
+
+    def _update_rule_selector(self) -> None:
+        """Update rule selector dropdown with current rules.
+
+        Enabled rules show ✓, disabled show ✗ TẮT.
+        Selecting a disabled rule triggers a warning.
+        """
+        options = ["▶ Tất cả rule đang bật"]
+        for rule in self.rule_engine.rules:
+            prefix = rule.icon or "📧"
+            if rule.enabled:
+                options.append(f"{prefix} {rule.name}")
+            else:
+                options.append(f"✗ {rule.name} (TẮT)")
+        self.rule_selector.configure(values=options)
+
+    def _get_selected_rules(self) -> list[EmailRule] | None:
+        """Get rules to run based on selector dropdown.
+
+        Returns None if a disabled rule was selected (shows warning).
+        Returns empty list if no enabled rules exist.
+        """
+        selected = self.rule_selector.get()
+
+        if selected == "▶ Tất cả rule đang bật":
+            return self.rule_engine.get_enabled_rules()
+
+        # Check if user selected a disabled rule
+        if selected.startswith("✗") and "(TẮT)" in selected:
+            # Extract rule name
+            rule_name = selected.replace("✗ ", "").replace(" (TẮT)", "")
+            messagebox.showinfo(
+                "Rule chưa bật",
+                f"Rule '{rule_name}' đang tắt.\n\n"
+                f"Vui lòng vào tab Rules để bật rule này trước khi chạy.",
+            )
+            self.rule_selector.set("▶ Tất cả rule đang bật")
+            return None
+
+        # Find matching enabled rule by name
+        for rule in self.rule_engine.rules:
+            if rule.name in selected:
+                if not rule.enabled:
+                    messagebox.showinfo(
+                        "Rule chưa bật",
+                        f"Rule '{rule.name}' đang tắt.\n\n"
+                        f"Vui lòng vào tab Rules để bật rule này trước khi chạy.",
+                    )
+                    self.rule_selector.set("▶ Tất cả rule đang bật")
+                    return None
+                return [rule]
+
+        return self.rule_engine.get_enabled_rules()
 
     def _on_run_now(self) -> None:
-        """Run email processing once in a background thread."""
+        """Run selected rules in a background thread."""
         if self._is_running:
             return
 
         if not self.gmail.is_authenticated:
             messagebox.showwarning(
-                "Not Connected",
-                "Please authenticate Gmail first in the Settings tab.",
+                "Chưa kết nối",
+                "Vui lòng kết nối Gmail trong tab Settings trước.",
             )
             return
+
+        # Get rules to run
+        rules_to_run = self._get_selected_rules()
+        if rules_to_run is None:
+            # User selected a disabled rule — warning already shown
+            return
+        if not rules_to_run:
+            messagebox.showinfo(
+                "Không có rule",
+                "Không có rule nào để chạy. Hãy bật ít nhất 1 rule trong tab Rules.",
+            )
+            return
+
+        rule_names = ", ".join(r.name for r in rules_to_run)
+        self._queue_log("info", f"Bắt đầu chạy: {rule_names}")
+
+        # Store for CompletionDialog
+        self._last_rules_run = rules_to_run
 
         self._is_running = True
         self.btn_run.configure(state="disabled", fg_color=Colors.SIDEBAR, text_color=Colors.TEXT_MUTED)
@@ -918,7 +1125,7 @@ class App(ctk.CTk):
         )
         self._set_status("● Running...", Colors.PRIMARY)
         self.progress_bar.set(0)
-        self.lbl_progress.configure(text="Starting...")
+        self.lbl_progress.configure(text=f"Đang chạy {len(rules_to_run)} rule...")
 
         # Create scheduler
         output_dir = Path(self.settings.get("output_dir", "downloads"))
@@ -934,7 +1141,7 @@ class App(ctk.CTk):
 
         def _run_worker():
             try:
-                result = self.scheduler.run_once()
+                result = self.scheduler.run_rules(rules_to_run)
             except Exception as e:
                 self._queue_log("error", f"Run failed: {e}")
             finally:
@@ -971,16 +1178,17 @@ class App(ctk.CTk):
         last = self.scheduler.last_result if self.scheduler else None
         if last:
             self._set_status("● Completed", Colors.SUCCESS)
-            self.lbl_summary.configure(text=last.summary())
+            self.lbl_stats_summary.configure(text=last.summary())
             self.lbl_last_run.configure(
                 text=f"Last run: {last.finished_at.strftime('%H:%M:%S')}"
             )
             self.lbl_progress.configure(
                 text=f"Done — {last.attachments_downloaded + last.bang_ke_downloaded} files"
             )
-            # Show completion dialog
+            # Show completion dialog with per-rule folders
             output_dir = Path(self.settings.get("output_dir", "downloads"))
-            CompletionDialog(self, last, output_dir)
+            rules_run = getattr(self, "_last_rules_run", [])
+            CompletionDialog(self, last, output_dir, rules_run=rules_run)
         else:
             self._set_status("● Ready", Colors.TEXT_MUTED)
 
@@ -1000,45 +1208,32 @@ class App(ctk.CTk):
         """Handle scheduler progress updates (from background thread)."""
         self.after(0, lambda: self.lbl_progress.configure(text=message))
 
-    # ── Rule Actions ─────────────────────────────────────────────────
+    # ── Rule Actions (v2.0 — toggle + folder only) ────────────────────
 
-    def _on_add_rule(self) -> None:
-        """Open dialog to add a new rule."""
-        dialog = RuleDialog(self, "Add Rule")
-        self.wait_window(dialog)
-        if dialog.result:
-            try:
-                self.rule_engine.add_rule(dialog.result)
-                self._refresh_rules_list()
-            except Exception as e:
-                messagebox.showerror("Error", str(e))
+    def _on_toggle_rule(self, rule: EmailRule, switch_var=None) -> None:
+        """Toggle a rule on/off and save its folder path."""
+        if switch_var is not None:
+            rule.enabled = switch_var.get()
+        else:
+            rule.enabled = not rule.enabled
 
-    def _on_delete_rule(self, name: str) -> None:
-        if messagebox.askyesno("Confirm", f"Delete rule '{name}'?"):
-            self.rule_engine.remove_rule(name)
-            self._refresh_rules_list()
+        # Also save folder path if entry exists
+        if rule.name in self._rule_folder_entries:
+            folder = self._rule_folder_entries[rule.name].get().strip()
+            if folder:
+                rule.output_folder = folder
 
-    def _on_toggle_rule(self, rule: EmailRule) -> None:
-        rule.enabled = not rule.enabled
         self.rule_engine.save_rules()
         self._refresh_rules_list()
 
-    def _on_edit_rule(self, rule: EmailRule) -> None:
-        """Open dialog to edit an existing rule."""
-        dialog = RuleDialog(self, f"Edit Rule — {rule.name}", rule=rule)
-        self.wait_window(dialog)
-        if dialog.result:
-            old_name = rule.name
-            try:
-                self.rule_engine.remove_rule(old_name)
-                self.rule_engine.add_rule(dialog.result)
-                self._refresh_rules_list()
-            except Exception as e:
-                try:
-                    self.rule_engine.add_rule(rule)
-                except Exception:
-                    pass
-                messagebox.showerror("Error", str(e))
+    def _on_browse_rule_folder(self, rule: EmailRule, entry: ctk.CTkEntry) -> None:
+        """Browse folder for a specific rule."""
+        path = filedialog.askdirectory(title=f"Chọn thư mục cho: {rule.name}")
+        if path:
+            entry.delete(0, "end")
+            entry.insert(0, path)
+            rule.output_folder = path
+            self.rule_engine.save_rules()
 
     # ── Settings Actions ─────────────────────────────────────────────
 
@@ -1082,9 +1277,40 @@ class App(ctk.CTk):
         self.lbl_summary.configure(text="Ready — click Run Now to start.")
 
 
-    def _on_open_folder(self) -> None:
-        output_dir = Path(self.settings.get("output_dir", "downloads"))
-        open_folder(output_dir)
+    def _update_folder_menu(self) -> None:
+        """Rebuild folder dropdown with per-rule folders."""
+        global_dir = self.settings.get("output_dir", "downloads")
+        options = [f"📂 Mặc định: {Path(global_dir).name}"]
+        for rule in self.rule_engine.rules:
+            if rule.enabled:
+                folder = rule.output_folder or global_dir
+                icon = rule.icon or "📧"
+                folder_name = Path(folder).name
+                options.append(f"{icon} {rule.name}: {folder_name}")
+        self.folder_menu.configure(values=options)
+        self.folder_menu.set("📂 Open Folder")
+
+    def _on_open_folder(self, selection: str = "") -> None:
+        """Open the folder matching the user's dropdown selection."""
+        global_dir = Path(self.settings.get("output_dir", "downloads"))
+
+        # Default / header item
+        if not selection or "Mặc định" in selection:
+            open_folder(global_dir)
+            self.folder_menu.set("📂 Open Folder")
+            return
+
+        # Find rule by name match
+        for rule in self.rule_engine.rules:
+            if rule.name in selection:
+                folder = Path(rule.output_folder) if rule.output_folder else global_dir
+                open_folder(folder)
+                self.folder_menu.set("📂 Open Folder")
+                return
+
+        # Fallback
+        open_folder(global_dir)
+        self.folder_menu.set("📂 Open Folder")
 
     # ── Helpers ──────────────────────────────────────────────────────
 
@@ -1117,7 +1343,7 @@ class App(ctk.CTk):
 class CompletionDialog(ctk.CTkToplevel):
     """Modern dialog shown after a scan/download run completes."""
 
-    def __init__(self, parent, result, output_dir: Path):
+    def __init__(self, parent, result, output_dir: Path, rules_run: list | None = None):
         super().__init__(parent)
         self.title("Hoàn tất")
         self.resizable(False, False)
@@ -1125,18 +1351,23 @@ class CompletionDialog(ctk.CTkToplevel):
         self.transient(parent)
         self.grab_set()
         self._output_dir = output_dir
+        self._rules_run = rules_run or []
 
         total_files = result.attachments_downloaded + result.bang_ke_downloaded
         has_errors = len(result.errors) > 0
         has_file_log = len(result.downloaded_files) > 0 or len(result.skipped_files) > 0
+        has_multi_rules = len(self._rules_run) > 1
 
         # Dynamic height based on content
-        base_h = 310
+        base_h = 350
         if has_file_log:
-            base_h += 160
+            base_h += 180
         if has_errors:
             base_h += 24
-        self.geometry(f"440x{base_h}")
+        base_h += 80  # folder buttons section always visible
+        if has_multi_rules:
+            base_h += 40 * len(self._rules_run)
+        self.geometry(f"480x{min(base_h, 700)}")
 
         # ── Header card ────────────────────────────
         if total_files > 0 and not has_errors:
@@ -1242,25 +1473,65 @@ class CompletionDialog(ctk.CTkToplevel):
                     justify="left",
                 ).pack(anchor="w", pady=1)
 
-        # ── Buttons ────────────────────────────────
-        btn_frame = ctk.CTkFrame(self, fg_color="transparent")
-        btn_frame.pack(fill="x", padx=20, pady=(10, 16))
+        # ── Folder buttons (per-rule) — always visible ──
+        folder_card = ctk.CTkFrame(
+            self, fg_color=Colors.CARD, corner_radius=10,
+            border_color=Colors.BORDER, border_width=1,
+        )
+        folder_card.pack(fill="x", padx=20, pady=6)
 
-        if total_files > 0:
+        ctk.CTkLabel(
+            folder_card, text="📂  Xem thư mục đã lưu",
+            font=("", 13, "bold"), text_color=Colors.TEXT,
+        ).pack(anchor="w", padx=14, pady=(8, 4))
+
+        if has_multi_rules:
+            # Per-rule folder buttons
+            for rule in self._rules_run:
+                r_icon = rule.icon or "📧"
+                r_folder = Path(rule.output_folder) if rule.output_folder else output_dir
+                folder_name = r_folder.name
+
+                btn_row = ctk.CTkFrame(folder_card, fg_color="transparent")
+                btn_row.pack(fill="x", padx=10, pady=2)
+
+                ctk.CTkButton(
+                    btn_row,
+                    text=f"{r_icon}  {rule.name}  →  {folder_name}",
+                    command=lambda f=r_folder: self._open_rule_folder(f),
+                    height=34,
+                    fg_color=Colors.PRIMARY,
+                    hover_color=Colors.PRIMARY_HOVER,
+                    font=("", 12),
+                    corner_radius=6,
+                    anchor="w",
+                ).pack(fill="x")
+
+            ctk.CTkFrame(folder_card, height=6, fg_color="transparent").pack()
+        else:
+            # Single rule — use THAT rule's folder
+            single_rule = self._rules_run[0] if self._rules_run else None
+            if single_rule and single_rule.output_folder:
+                single_folder = Path(single_rule.output_folder)
+                btn_label = f"{single_rule.icon or '📂'}  Mở: {single_folder.name}"
+            else:
+                single_folder = output_dir
+                btn_label = "📂  Mở thư mục tải về"
+
             ctk.CTkButton(
-                btn_frame,
-                text="📂  Xem thư mục đã lưu",
-                command=self._open_folder,
-                width=200,
-                height=40,
+                folder_card,
+                text=btn_label,
+                command=lambda f=single_folder: self._open_rule_folder(f),
+                height=36,
                 fg_color=Colors.PRIMARY,
                 hover_color=Colors.PRIMARY_HOVER,
-                font=("", 14, "bold"),
+                font=("", 13, "bold"),
                 corner_radius=8,
-            ).pack(side="left", padx=(0, 8))
+            ).pack(fill="x", padx=10, pady=(0, 8))
 
+        # ── Close button ──────────────────────────
         ctk.CTkButton(
-            btn_frame,
+            self,
             text="Đóng",
             command=self.destroy,
             width=100,
@@ -1270,146 +1541,25 @@ class CompletionDialog(ctk.CTkToplevel):
             text_color=Colors.TEXT,
             font=("", 13),
             corner_radius=8,
-        ).pack(side="right")
+        ).pack(pady=(8, 16))
 
-        # Center on parent
+        # Center on screen
         self.update_idletasks()
-        pw = parent.winfo_width()
-        ph = parent.winfo_height()
-        px = parent.winfo_x()
-        py = parent.winfo_y()
         w = self.winfo_width()
         h = self.winfo_height()
-        self.geometry(f"+{px + (pw - w) // 2}+{py + (ph - h) // 2}")
+        sx = (self.winfo_screenwidth() - w) // 2
+        sy = (self.winfo_screenheight() - h) // 2
+        self.geometry(f"+{sx}+{sy}")
 
     def _open_folder(self) -> None:
         open_folder(self._output_dir)
-        self.destroy()
+
+    def _open_rule_folder(self, folder: Path) -> None:
+        open_folder(folder)
 
 
-# ── Rule Dialog ──────────────────────────────────────────────────────
-
-class RuleDialog(ctk.CTkToplevel):
-    """Dialog for adding/editing a rule — Light Theme."""
-
-    def __init__(self, parent, title: str, rule: EmailRule | None = None):
-        super().__init__(parent)
-        self.title(title)
-        self.geometry("520x520")
-        self.configure(fg_color=Colors.CARD)
-        self.result: EmailRule | None = None
-        self.transient(parent)
-        self.grab_set()
-
-        pad = {"padx": 16, "pady": 5}
-
-        ctk.CTkLabel(
-            self, text="Rule Name:", text_color=Colors.TEXT, font=("", 12, "bold")
-        ).pack(anchor="w", **pad)
-        self.entry_name = ctk.CTkEntry(
-            self,
-            width=460,
-            fg_color=Colors.LOG_BG,
-            border_color=Colors.BORDER,
-            text_color=Colors.TEXT,
-        )
-        self.entry_name.pack(**pad)
-
-        ctk.CTkLabel(
-            self, text="Subject Query:", text_color=Colors.TEXT, font=("", 12, "bold")
-        ).pack(anchor="w", **pad)
-        self.entry_subject = ctk.CTkEntry(
-            self,
-            width=460,
-            fg_color=Colors.LOG_BG,
-            border_color=Colors.BORDER,
-            text_color=Colors.TEXT,
-        )
-        self.entry_subject.pack(**pad)
-
-        ctk.CTkLabel(
-            self, text="Sender Filter:", text_color=Colors.TEXT, font=("", 12, "bold")
-        ).pack(anchor="w", **pad)
-        self.entry_sender = ctk.CTkEntry(
-            self,
-            width=460,
-            fg_color=Colors.LOG_BG,
-            border_color=Colors.BORDER,
-            text_color=Colors.TEXT,
-        )
-        self.entry_sender.pack(**pad)
-
-        self.chk_attachments = ctk.CTkCheckBox(
-            self,
-            text="Download attachments",
-            text_color=Colors.TEXT,
-            fg_color=Colors.PRIMARY,
-            hover_color=Colors.PRIMARY_HOVER,
-        )
-        self.chk_attachments.select()
-        self.chk_attachments.pack(anchor="w", **pad)
-
-        self.chk_bang_ke = ctk.CTkCheckBox(
-            self,
-            text="Download invoice details link",
-            text_color=Colors.TEXT,
-            fg_color=Colors.PRIMARY,
-            hover_color=Colors.PRIMARY_HOVER,
-        )
-        self.chk_bang_ke.select()
-        self.chk_bang_ke.pack(anchor="w", **pad)
-
-        # Pre-fill if editing
-        if rule:
-            self.entry_name.insert(0, rule.name)
-            self.entry_subject.insert(0, rule.subject_query)
-            self.entry_sender.insert(0, rule.sender_filter)
-
-        # Buttons
-        btn_frame = ctk.CTkFrame(self, fg_color="transparent")
-        btn_frame.pack(fill="x", padx=16, pady=16)
-
-        ctk.CTkButton(
-            btn_frame,
-            text="Save",
-            command=self._on_save,
-            width=110,
-            height=36,
-            fg_color=Colors.SUCCESS,
-            hover_color=Colors.SUCCESS_HOVER,
-            font=("", 13, "bold"),
-            corner_radius=8,
-        ).pack(side="right", padx=5)
-
-        ctk.CTkButton(
-            btn_frame,
-            text="Cancel",
-            command=self.destroy,
-            width=90,
-            height=36,
-            fg_color=Colors.SIDEBAR,
-            hover_color=Colors.BORDER,
-            text_color=Colors.TEXT,
-            font=("", 13),
-            corner_radius=8,
-        ).pack(side="right")
-
-    def _on_save(self) -> None:
-        name = self.entry_name.get().strip()
-        if not name:
-            messagebox.showwarning("Required", "Rule name is required.")
-            return
-
-        self.result = EmailRule(
-            name=name,
-            enabled=True,
-            subject_query=self.entry_subject.get().strip(),
-            sender_filter=self.entry_sender.get().strip(),
-            output_folder="",
-            download_attachments=bool(self.chk_attachments.get()),
-            download_bang_ke=bool(self.chk_bang_ke.get()),
-        )
-        self.destroy()
+# RuleDialog removed in v2.0 — rules are now dev-configured only.
+# Users control rules via toggle switch and folder picker on the Rules tab.
 
 
 # ── Entry Point ──────────────────────────────────────────────────────

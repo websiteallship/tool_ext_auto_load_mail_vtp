@@ -19,6 +19,8 @@ from typing import Callable
 
 from src.file_downloader import FileDownloader
 from src.gmail_client import GmailClient
+from src.handlers import get_handler
+from src.handlers.base import BaseEmailHandler, DownloadTarget, ExtractionConfig
 from src.link_extractor import LinkExtractor
 from src.models import (
     AppError,
@@ -87,8 +89,15 @@ class Scheduler:
         return self._last_result
 
     def run_once(self) -> RunResult:
-        """
-        Run one complete processing cycle for all enabled rules.
+        """Run one complete processing cycle for all enabled rules."""
+        rules = self.rule_engine.get_enabled_rules()
+        return self.run_rules(rules)
+
+    def run_rules(self, rules: list[EmailRule]) -> RunResult:
+        """Run processing for a specific list of rules.
+
+        Args:
+            rules: List of EmailRule objects to process (can be 1 or many).
 
         Returns:
             RunResult with statistics
@@ -101,9 +110,9 @@ class Scheduler:
         self._load_processed_ids()
 
         try:
-            rules = self.rule_engine.get_enabled_rules()
             result.rules_processed = len(rules)
-            self._log("info", f"Starting run ({len(rules)} rules enabled)")
+            rule_names = ", ".join(r.name for r in rules)
+            self._log("info", f"Starting run ({len(rules)} rules): {rule_names}")
 
             for rule in rules:
                 if self._stop_event.is_set():
@@ -162,9 +171,21 @@ class Scheduler:
     # ── Processing Logic ─────────────────────────────────────────────
 
     def _process_rule(self, rule: EmailRule, result: RunResult) -> None:
-        """Process a single email rule."""
+        """Process a single email rule using its handler."""
+        rule_index = result.rules_processed
+        total_rules = len(self.rule_engine.get_enabled_rules())
         self._log("info", f"Processing rule: {rule.name}")
-        self._progress(f"Rule: {rule.name}")
+        self._progress(f"Rule {rule_index}/{total_rules}: {rule.name}")
+
+        # Get handler for this rule
+        handler = get_handler(rule.handler_type)
+        config = handler.resolve_config(rule.extraction_config)
+        self._log("info", f"  Handler: {handler.display_name} ({handler.handler_type})")
+
+        # Determine output folder
+        rule_output = self.output_dir
+        if rule.output_folder:
+            rule_output = Path(rule.output_folder)
 
         try:
             query = rule.to_gmail_query()
@@ -173,7 +194,7 @@ class Scheduler:
             self._log("info", f"Found {len(emails)} emails for rule '{rule.name}'")
 
             downloader = FileDownloader(
-                output_dir=self.output_dir,
+                output_dir=rule_output,
                 skip_duplicates=True,
             )
 
@@ -188,7 +209,7 @@ class Scheduler:
                     continue
 
                 self._progress(f"Email: {email.subject[:50]}")
-                self._process_email(email, rule, downloader, result)
+                self._process_email(email, rule, handler, config, downloader, result)
                 self._processed_ids.add(email.id)
 
             if skipped_count > 0:
@@ -197,6 +218,7 @@ class Scheduler:
             downloader.close()
 
         except Exception as e:
+            # Error isolation: log and continue to next rule
             self._log("error", f"Rule '{rule.name}' failed: {e}")
             result.errors.append(f"Rule '{rule.name}': {e}")
 
@@ -204,25 +226,30 @@ class Scheduler:
         self,
         email,
         rule: EmailRule,
+        handler: BaseEmailHandler,
+        config: ExtractionConfig,
         downloader: FileDownloader,
         result: RunResult,
     ) -> None:
-        """Process a single email: download attachments + bảng kê."""
+        """Process a single email using handler + auto-subfolder by date."""
         self._log("info", f"  → Email: {email.subject[:60]}")
 
-        # 1. Download attachments
-        if rule.download_attachments:
+        # Auto-subfolder by email date: YYYYMM format
+        month_folder = email.date.strftime("%Y%m") if email.date else ""
+
+        # 1. Download attachments (filtered by handler)
+        if config.download_attachments:
             try:
                 attachments = self.gmail.get_attachments(email.id)
-                self._log("info", f"    Attachments found: {len(attachments)}")
-                for att in attachments:
-                    ext = Path(att.filename).suffix.lower()
-                    if rule.attachment_extensions and ext not in rule.attachment_extensions:
-                        self._log("info", f"    Skipped (extension {ext} not in filter): {att.filename}")
-                        continue
+                filtered = handler.filter_attachments(attachments, config)
+                self._log("info", f"    Attachments: {len(attachments)} total, {len(filtered)} matched")
+
+                for att in filtered:
                     try:
                         data, _ = self.gmail.download_attachment(email.id, att.id)
-                        dl_result = downloader.save_attachment(data, att.filename)
+                        dl_result = downloader.save_attachment(
+                            data, att.filename, subfolder=month_folder,
+                        )
                         self._log("info", f"    [{dl_result.status.value}] {att.filename}")
                         if dl_result.status == DownloadStatus.SUCCESS:
                             result.attachments_downloaded += 1
@@ -231,26 +258,25 @@ class Scheduler:
                             result.skipped_duplicates += 1
                             result.skipped_files.append(att.filename)
                     except Exception as e:
-                        self._log("warning", f"    Attachment download error ({att.filename}): {e}")
+                        self._log("warning", f"    Attachment error ({att.filename}): {e}")
                         result.errors.append(f"Attachment {att.filename}: {e}")
             except Exception as e:
                 self._log("warning", f"    get_attachments() error: {e}")
                 result.errors.append(f"get_attachments: {e}")
 
-        # 2. Extract and download bảng kê
-        if rule.download_bang_ke:
+        # 2. Extract and download links (via handler)
+        if config.download_links:
             try:
                 body = self.gmail.get_email_body(email.id)
-                self._log("info", f"    Body length: {len(body) if body else 0} chars")
                 if body:
-                    bang_ke_url = self._link_extractor.extract_bang_ke_link(body)
-                    self._log("info", f"    Bảng kê URL: {bang_ke_url or 'NOT FOUND'}")
-                    if bang_ke_url:
-                        self._log("info", "    Downloading bảng kê...")
-                        dl_result = downloader.download_from_url(
-                            bang_ke_url, subfolder="bang_ke"
+                    targets = handler.extract_download_links(body, config)
+                    self._log("info", f"    Download targets: {len(targets)}")
+
+                    for target in targets:
+                        self._log("info", f"    Downloading: {target.context or target.url[:60]}")
+                        dl_result = self._download_target(
+                            target, config, downloader, month_folder,
                         )
-                        self._log("info", f"    [{dl_result.status.value}] bangke — {dl_result.error_message or dl_result.filename}")
                         if dl_result.status == DownloadStatus.SUCCESS:
                             result.bang_ke_downloaded += 1
                             result.downloaded_files.append(f"📊 {dl_result.filename}")
@@ -261,11 +287,84 @@ class Scheduler:
                             DownloadStatus.FAILED,
                             DownloadStatus.FAILED_RETRY_EXHAUSTED,
                         ):
-                            self._log("warning", f"    Bảng kê download failed: {dl_result.error_message}")
+                            self._log("warning", f"    Download failed: {dl_result.error_message}")
                 else:
-                    self._log("warning", "    Email body is empty — skip bảng kê extraction")
+                    self._log("warning", "    Email body is empty")
             except Exception as e:
-                self._log("warning", f"    Bảng kê extraction error: {e}")
+                self._log("warning", f"    Link extraction error: {e}")
+
+    def _download_target(
+        self,
+        target: DownloadTarget,
+        config: ExtractionConfig,
+        downloader: FileDownloader,
+        subfolder: str,
+    ) -> "DownloadResult":
+        """Download a single target URL, with optional redirect following."""
+        from src.models import DownloadResult, DownloadStatus
+
+        url = target.url
+
+        # Follow redirects if handler requires it (e.g., J&T tracking URLs)
+        if config.follow_redirects:
+            try:
+                import requests
+                resp = requests.get(url, allow_redirects=True, timeout=30)
+                url = resp.url  # final URL after redirects
+                self._log("info", f"    Redirected to: {url[:80]}")
+
+                # Save the response content directly
+                content_type = resp.headers.get("Content-Type", "")
+                filename = target.filename_hint
+
+                # Refine filename based on content type
+                if not filename:
+                    if "pdf" in content_type:
+                        filename = "invoice.pdf"
+                    elif "xml" in content_type:
+                        filename = "invoice.xml"
+                    else:
+                        filename = "download.bin"
+
+                # Skip HTML pages (search pages etc)
+                if "text/html" in content_type:
+                    self._log("info", f"    Skipping HTML page: {url[:60]}")
+                    return DownloadResult(
+                        status=DownloadStatus.FAILED,
+                        filepath=None,
+                        filename=filename,
+                        error_message="URL returned HTML page (not a file)",
+                    )
+
+                return downloader.save_attachment(
+                    resp.content, filename, subfolder=subfolder,
+                )
+
+            except Exception as e:
+                self._log("error", f"    Redirect follow error: {e}")
+                return DownloadResult(
+                    status=DownloadStatus.FAILED,
+                    filepath=None,
+                    filename=target.filename_hint or "unknown",
+                    error_message=str(e),
+                )
+
+        # Normal download (no redirect) — delegate to downloader
+        # Temporarily add handler's domains to the downloader allowlist
+        original_domains = downloader._ALLOWED_DOMAINS
+        if config.allowed_domains:
+            downloader._ALLOWED_DOMAINS = list(
+                set(original_domains + config.allowed_domains)
+            )
+
+        try:
+            return downloader.download_from_url(
+                url,
+                filename=target.filename_hint or None,
+                subfolder=subfolder,
+            )
+        finally:
+            downloader._ALLOWED_DOMAINS = original_domains
 
     # ── Auto-schedule Loop ───────────────────────────────────────────
 

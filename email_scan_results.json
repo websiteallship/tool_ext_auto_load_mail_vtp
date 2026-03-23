@@ -1,0 +1,959 @@
+[
+  {
+    "query_label": "Forwarded from ketoan",
+    "subject": "Spreadsheet shared with you: \"AS PACKAGING\"",
+    "sender": "\"Pa Op (via Google Sheets)\" <drive-shares-dm-noreply@google.com>",
+    "date": "2026-03-13T10:34:25+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 5676,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Forwarded from ketoan",
+    "subject": "Fwd: Tổng công ty Cổ phần Bưu Chính Viettel",
+    "sender": "Allship Wesite <website.allship@gmail.com>",
+    "date": "2026-03-10T18:42:00+07:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "0104093672-K26TAN2038744.zip",
+        "application/zip",
+        3474
+      ],
+      [
+        "K26TAN2038744.pdf",
+        "application/pdf",
+        138133
+      ]
+    ],
+    "body_length": 2090,
+    "bang_ke_link": "https://s1.viettelpost.vn/bang-ke-hoa-don-chi-tiet.do?invoiceId=yjk5tSSV4Ns9k8HCF_Qn4w==",
+    "invoice_number": "K26TAN2038744"
+  },
+  {
+    "query_label": "Forwarded from ketoan",
+    "subject": "Fwd: Tổng công ty Cổ phần Bưu Chính Viettel",
+    "sender": "Allship Wesite <website.allship@gmail.com>",
+    "date": "2026-03-10T18:41:51+07:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "0104093672-K26TAN1890970.zip",
+        "application/zip",
+        3411
+      ],
+      [
+        "K26TAN1890970.pdf",
+        "application/pdf",
+        138327
+      ]
+    ],
+    "body_length": 2090,
+    "bang_ke_link": "https://s1.viettelpost.vn/bang-ke-hoa-don-chi-tiet.do?invoiceId=nKxt43DNn7LU6qPA-M7evw==",
+    "invoice_number": "K26TAN1890970"
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 3447074198638434)",
+    "sender": "Meta for Business <noreply@business-updates.facebook.com>",
+    "date": "2026-01-03T15:46:02-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 27490,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 3447074198638434)",
+    "sender": "Meta for Business <noreply@business-updates.facebook.com>",
+    "date": "2025-12-29T06:01:49-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 29826,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 3447074198638434)",
+    "sender": "Meta for Business <noreply@business-updates.facebook.com>",
+    "date": "2025-12-23T18:24:08-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 24019,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 3447074198638434)",
+    "sender": "Meta for Business <noreply@business-updates.facebook.com>",
+    "date": "2025-12-22T04:30:05-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 25404,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 3447074198638434)",
+    "sender": "Meta for Business <noreply@business-updates.facebook.com>",
+    "date": "2025-12-18T21:52:04-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 38204,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 3447074198638434)",
+    "sender": "Meta for Business <noreply@business-updates.facebook.com>",
+    "date": "2025-12-16T18:25:22-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 33619,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 3447074198638434)",
+    "sender": "Meta for Business <noreply@business-updates.facebook.com>",
+    "date": "2025-12-16T14:59:27-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 32394,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 984993836153884)",
+    "sender": "Meta for Business <advertise-noreply@support.facebook.com>",
+    "date": "2025-12-12T04:27:58-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 33487,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 984993836153884)",
+    "sender": "Meta for Business <advertise-noreply@support.facebook.com>",
+    "date": "2025-12-11T16:52:28-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 31464,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 1360527597990636)",
+    "sender": "Meta for Business <noreply@business-updates.facebook.com>",
+    "date": "2025-12-10T21:38:49-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 27472,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 984993836153884)",
+    "sender": "Meta for Business <advertise-noreply@support.facebook.com>",
+    "date": "2025-12-10T21:38:14-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 27450,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 984993836153884)",
+    "sender": "Meta for Business <advertise-noreply@support.facebook.com>",
+    "date": "2025-12-10T17:17:12-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 29800,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 984993836153884)",
+    "sender": "Meta for Business <advertise-noreply@support.facebook.com>",
+    "date": "2025-12-10T17:16:48-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 29793,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 984993836153884)",
+    "sender": "Meta for Business <advertise-noreply@support.facebook.com>",
+    "date": "2025-12-09T16:35:38-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 27480,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 984993836153884)",
+    "sender": "Meta for Business <advertise-noreply@support.facebook.com>",
+    "date": "2025-12-08T18:39:32-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 28179,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 858617306597426)",
+    "sender": "Meta for Business <advertise-noreply@support.facebook.com>",
+    "date": "2025-12-08T16:23:39-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 35394,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 984993836153884)",
+    "sender": "Meta for Business <advertise-noreply@support.facebook.com>",
+    "date": "2025-12-07T20:59:28-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 28179,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 984993836153884)",
+    "sender": "Meta for Business <advertise-noreply@support.facebook.com>",
+    "date": "2025-12-07T02:05:13-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 31439,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 984993836153884)",
+    "sender": "Meta for Business <advertise-noreply@support.facebook.com>",
+    "date": "2025-12-06T07:24:41-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 31457,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "Meta/FB invoices",
+    "subject": "Biên lai quảng cáo Meta của bạn (ID tài khoản: 858617306597426)",
+    "sender": "Meta for Business <advertise-noreply@support.facebook.com>",
+    "date": "2025-12-06T06:32:35-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 36089,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "[Product Update] Automatic enablement of new OpenTelemetry ingestion API",
+    "sender": "Google Cloud <CloudPlatform-noreply@google.com>",
+    "date": "2026-03-19T11:48:20-07:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "dc9fdd3a-2237-11f1-ace8-883d24f4fc44.csv",
+        "text/csv",
+        104
+      ]
+    ],
+    "body_length": 22060,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "[Shopee (Kênh Quản Lý Shop) - Đơn hàng giao không thành công đã được hoàn trả]",
+    "sender": "Shopee <info@shopee.vn>",
+    "date": "2025-08-28T02:00:28+00:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "Don giao khong thanh cong da hoan tra_20250827.xlsx",
+        "application/octet-stream",
+        21470
+      ]
+    ],
+    "body_length": 13307,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "1383772958 | Allship Packaging | SPX Express Biên bản trả hàng | RAT202508271BQSO | 27-08-2025",
+    "sender": "info@mail.spxexpress.com",
+    "date": "2025-08-27T12:56:48+00:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "_downloads_runsheet_2025_08_27_runsheet_RAT202508271BQSO_1383772958_1_1031459428.pdf",
+        "application/pdf",
+        213736
+      ]
+    ],
+    "body_length": 2959,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "[Shopee (Kênh Quản Lý Shop) - Đơn hàng giao không thành công đã được hoàn trả]",
+    "sender": "Shopee <info@shopee.vn>",
+    "date": "2025-08-13T02:00:22+00:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "Don giao khong thanh cong da hoan tra_20250812.xlsx",
+        "application/octet-stream",
+        21470
+      ]
+    ],
+    "body_length": 13307,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "Khảo sát dịch vụ Chăm sóc khách hàng",
+    "sender": "Shopee VN <no-reply@support.shopee.vn>",
+    "date": "2025-04-03T07:10:19+00:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "7e8ec6fa73e94863bef6c6a5c84939a8_0ade81ad34b149ec8cc8a8af12a09fd2.png",
+        "image/png",
+        1367
+      ],
+      [
+        "bb5a780decd84af7bb8c12f82bf28055_4400df9263fc47539a6fcaac72e07af4.png",
+        "image/png",
+        995
+      ],
+      [
+        "0dea2d44d41143c19589647f5e445b7a_4462883b6d5b4a778f09c8567735ddfe.png",
+        "image/png",
+        1147
+      ]
+    ],
+    "body_length": 10089,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "[Giao hàng & Nhận hàng] Shopee phản hồi yêu cầu",
+    "sender": "Shopee VN Team <cskh@hotro.shopee.vn>",
+    "date": "2025-03-18T13:22:02+08:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "08ad6cd9c9e541078421a6fad8159504_d41570922a304b4694ac08e61db8d1fc.png",
+        "image/png",
+        33
+      ]
+    ],
+    "body_length": 6154,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "Khảo sát dịch vụ Chăm sóc khách hàng",
+    "sender": "Shopee VN <no-reply@hotro.shopee.vn>",
+    "date": "2025-03-18T13:11:59+08:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "c20b98d9dcea4531a05ea0f7533f0496_4462883b6d5b4a778f09c8567735ddfe.png",
+        "image/png",
+        1147
+      ],
+      [
+        "a4efd5652c584227a772467064aba5c1_4400df9263fc47539a6fcaac72e07af4.png",
+        "image/png",
+        995
+      ],
+      [
+        "c8b1ff6606ce482e8666024619d96c1a_0ade81ad34b149ec8cc8a8af12a09fd2.png",
+        "image/png",
+        1367
+      ]
+    ],
+    "body_length": 7628,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "Khảo sát dịch vụ Chăm sóc khách hàng",
+    "sender": "Shopee VN <no-reply@hotro.shopee.vn>",
+    "date": "2025-03-15T11:37:39+08:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "0a0646830c494f8c9094aa7d547a01da_4462883b6d5b4a778f09c8567735ddfe.png",
+        "image/png",
+        1147
+      ],
+      [
+        "3ebee1a39c244f2c88302991005ef61c_4400df9263fc47539a6fcaac72e07af4.png",
+        "image/png",
+        995
+      ],
+      [
+        "0cdc546d4dc543fa8ab17416227cc3ad_0ade81ad34b149ec8cc8a8af12a09fd2.png",
+        "image/png",
+        1367
+      ]
+    ],
+    "body_length": 7629,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "Hội thảo TikTok Shop: Tối Ưu Đề Xuất và Tăng Chuyển Đổi cho Sản Phẩm Của Nhà bán hàng Confirmation",
+    "sender": "\"Hội thảo TikTok Shop\" <no-reply@zoom.us>",
+    "date": "2024-07-17T03:31:35+00:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "invite.ics",
+        "text/calendar",
+        2143
+      ]
+    ],
+    "body_length": 30014,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "Hội Thảo TikTok Shop: Ra Đơn Thụ Động Qua Trang Mua Sắm ShopTab - Bí Quyết Trong Tầm Tay Confirmation",
+    "sender": "Thoa Chu <no-reply@zoom.us>",
+    "date": "2024-07-17T03:28:35+00:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "invite.ics",
+        "text/calendar",
+        2117
+      ]
+    ],
+    "body_length": 30022,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "Hội thảo TikTok Shop: Xây Dựng Video Bán Hàng Chuẩn Xu Hướng Confirmation",
+    "sender": "\"Hội thảo TikTok Shop\" <no-reply@zoom.us>",
+    "date": "2024-07-17T03:24:42+00:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "invite.ics",
+        "text/calendar",
+        2179
+      ]
+    ],
+    "body_length": 29964,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "Bạn có 1 đơn hàng cần vận chuyển",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2024-07-14T08:40:24+00:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "Orders to ship_2024-07-14.csv",
+        "text/csv",
+        158
+      ]
+    ],
+    "body_length": 1894,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "Bạn có 1 đơn hàng cần vận chuyển",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2024-07-12T02:38:36+00:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "Orders to ship_2024-07-12.csv",
+        "text/csv",
+        158
+      ]
+    ],
+    "body_length": 1898,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "Bạn có 1 đơn hàng cần vận chuyển",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2024-07-03T02:42:20+00:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "Orders to ship_2024-07-03.csv",
+        "text/csv",
+        158
+      ]
+    ],
+    "body_length": 1910,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "Bạn có 1 đơn hàng cần vận chuyển",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2024-06-20T02:36:01+00:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "Orders to ship_2024-06-20.csv",
+        "text/csv",
+        158
+      ]
+    ],
+    "body_length": 1914,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "Mot de passe Tumblr",
+    "sender": "Tumblr <no-reply@tumblr.com>",
+    "date": "2024-06-08T11:02:03+00:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "email_footer_logo_2023_2x.png",
+        "image/png",
+        938
+      ]
+    ],
+    "body_length": 7611,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "With attachments",
+    "subject": "Validez votre adresse e-mail",
+    "sender": "Tumblr <no-reply@tumblr.com>",
+    "date": "2024-06-04T01:53:56-07:00",
+    "has_attachments": false,
+    "attachments": [
+      [
+        "email_footer_logo_2023_2x.png",
+        "image/png",
+        938
+      ]
+    ],
+    "body_length": 7733,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "EVN",
+    "subject": "Mắt Xem LIVE Tụt? Công Thức Kéo 3 Tỷ/Tháng Cùng Chủ Shop Thật Tại Hội Thảo TikTok Shop",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2026-03-15T07:46:44+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 58797,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "EVN",
+    "subject": "Quyền lợi độc quyền: hỗ trợ thực tế cho nội dung trên Reels",
+    "sender": "\"Bian D.\" <advertise-noreply@global.metamail.com>",
+    "date": "2025-09-24T18:11:12-06:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 26216,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "EVN",
+    "subject": "[Cập nhật chính sách] Tiêu chí đủ điều kiện mới cho Cộng tác liên kết.",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2025-09-15T05:20:25+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 21707,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "EVN",
+    "subject": "Nâng Cấp Livestream Thành Công & Bứt Phá Doanh Số Ngoạn Mục Cùng LIVE GMV Max",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2025-07-14T11:06:03+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 80367,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "EVN",
+    "subject": "Tự Tin Làm Chủ Mọi Chiến Dịch Khuyến Mãi Tại TikTok Shop",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2025-03-23T14:02:20+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 87014,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "EVN",
+    "subject": "Lời nhắc: thực hiện điều này để góp phần nâng cao hiệu quả quảng cáo của bạn",
+    "sender": "\"Tran B.\" <advertise-noreply@support.facebook.com>",
+    "date": "2025-03-02T18:08:12-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 11140,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "EVN",
+    "subject": "Thực hiện cập nhật này để góp phần giảm chi phí quảng cáo trong năm 2025",
+    "sender": "\"Tran B.\" <advertise-noreply@support.facebook.com>",
+    "date": "2025-02-25T18:02:20-08:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 11174,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "💥 Giao nhanh \"thần tốc\" cùng Trợ lý AI - Tìm hiểu nhanh - nhận Voucher khủng! 😱",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2026-03-10T10:05:40+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 32832,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "[Hỏa Tốc] Bắt Đầu Từ Tốc Độ Giao Hàng Nếu Muốn Doanh Số Bật Lại Sau Tết - Đăng Ký Ngay!",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2026-03-02T07:59:33+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 72990,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "Khoe Thành Tích - Gom Quà Hời: Về Chung Nhà TikTokHood!",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2026-03-01T06:46:43+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 91048,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "Thương Nhân TikTokHood: Hành Trình Khai Xuân - Đón Vận - Săn Lộc...Đang Diễn Ra!",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2026-02-13T04:35:47+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 96506,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "🧨 [VidBoost] Chốt Video Trước Tết – Hanh Thông Cả Năm 2026! (Trước 10/02)",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2026-02-06T10:16:23+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 59155,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "Tết Không Nghỉ - Đơn Vẫn Về, Quà Vẫn Có: Nhận Ngay 500 Vouchers Từ TikTok Shop!",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2026-02-06T06:47:50+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 93630,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "Tết Này - Xem Video Cài Đặt Giao Hỏa Tốc & Nhận Voucher Sốc Để Bắt Trọn Mọi Đơn!",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2026-02-05T06:55:06+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 32623,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "💥 [TRỢ LÝ VẬN HÀNH] 💥 VẬN HÀNH TRƠN TRU MÙA MEGA, CÓ NGAY SUPER PI!",
+    "sender": "Shopee <info@newsletter.shopee.vn>",
+    "date": "2026-01-30T08:23:48+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 17976,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "Sai Ở Đâu Sẽ Bị Khóa/Giới Hạn Cửa Hàng? Phòng Tránh Vi Phạm Tết Này Cùng Lớp Học TikTok Shop",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2026-01-29T03:50:30+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 72539,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "Tết Này Kể Chuyện, TikTokHood Lì Xì Hộp Quà Hoành Tráng!",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2026-01-25T09:54:15+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 93482,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "🧧Cận Tết Bính Ngọ: Đừng Bỏ Lỡ Đơn Giá Trị Cao Với Dịch Vụ Hỏa Tốc Này",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2026-01-25T03:35:16+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 85554,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "💥 [TRỢ LÝ VẬN HÀNH] 💥 VẬN HÀNH TRƠN TRU MÙA MEGA, CÓ NGAY SUPER PI!",
+    "sender": "Shopee <info@newsletter.shopee.vn>",
+    "date": "2026-01-16T05:02:19+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 18016,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "[Shopee] Trải nghiệm ngay Ứng dụng Kênh Người Bán Shopee",
+    "sender": "Shopee <info@newsletter.shopee.vn>",
+    "date": "2026-01-15T12:20:34+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 20415,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "⚡Kích Hoạt Dịch Vụ Hỏa Tốc Miễn Phí - Đón Đầu Mọi Đơn Tốc Độ",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2026-01-15T05:56:25+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 26626,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "500 Vouchers Bán Hàng Mỗi Tuần - Shop Bạn Đã Có Chưa?",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2026-01-11T06:47:23+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 90081,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "[TikTokHood] Minigame “Xin Vía Số Dzách” Tuần 2 - Chọn Ngày Đúng, Trúng Ngay Quà!",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2026-01-11T04:00:03+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 64997,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "[Shopee] Trải nghiệm ngay Ứng dụng Kênh Người Bán Shopee",
+    "sender": "Shopee <info@newsletter.shopee.vn>",
+    "date": "2026-01-02T07:42:07+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 20415,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "Bán TikTok Shop Không Khó Khi Bạn Có Cộng Đồng TikTokHood Đồng Hành",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2025-12-21T10:41:04+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 111043,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "Ra mắt SePay eShop và SePay eInvoice: Phần mềm bán hàng và xuất hóa đơn điện tử",
+    "sender": "Team SePay <team@sepay.vn>",
+    "date": "2025-12-16T13:26:51+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 11203,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHN",
+    "subject": "💥 [TRỢ LÝ VẬN HÀNH] 💥 VẬN HÀNH TRƠN TRU MÙA MEGA, CÓ NGAY SUPER PI!",
+    "sender": "Shopee <info@newsletter.shopee.vn>",
+    "date": "2025-12-12T04:55:49+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 18795,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHTK",
+    "subject": "Mách Bạn Cách Định Vị Sản Phẩm Đúng – Bán Ít Vẫn Lãi Cao | Chiến Lược Từ Top 2 TSP SMB",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2025-10-25T08:20:37+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 67887,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHTK",
+    "subject": "SePay ra mắt giải pháp Thanh toán thẻ & Thanh toán qua VietQRPay/VietQRGlobal",
+    "sender": "Team SePay <team@sepay.vn>",
+    "date": "2025-10-21T16:09:27+07:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 10375,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHTK",
+    "subject": "Bước Vào TikTokHood - Bước Gần Hơn Đến Thành Công!",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2025-10-05T05:03:12+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 106616,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHTK",
+    "subject": "Tối Ưu Quảng Cáo Cuối Năm & Nhận Voucher Độc Quyền Ngay Tuần Này!",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2024-12-18T04:59:47+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 43381,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "GHTK",
+    "subject": "Mở Rộng Đối Tác Cho Dịch Vụ Lấy Hàng Tận Nơi Cho Khách Có Nhu Cầu Trả Hàng.",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2024-10-24T15:03:24+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 15122,
+    "bang_ke_link": null,
+    "invoice_number": null
+  },
+  {
+    "query_label": "J&T",
+    "subject": "🚚 Hiện đã có bằng chứng giao hàng trên Trung tâm Nhà Bán Hàng!",
+    "sender": "TikTok Shop <sellersupport@shop.tiktok.com>",
+    "date": "2024-10-23T11:22:35+00:00",
+    "has_attachments": false,
+    "attachments": [],
+    "body_length": 13508,
+    "bang_ke_link": null,
+    "invoice_number": null
+  }
+]

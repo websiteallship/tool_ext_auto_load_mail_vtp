@@ -1,141 +1,126 @@
-# FEATURE: Scheduler & Automation
+# FEATURE: Scheduler & Automation (v2.1)
 
 > Skills áp dụng: `05_async-python-patterns`, `09_error-handling-patterns`
 
 ## Mục Đích
 
-Module tự động chạy email processing theo lịch, hỗ trợ cả chạy thủ công (run once) và chạy nền liên tục.
+Module điều phối email processing: run once, run rules, preview (dry-run), auto-schedule, và history tracking.
 
 ---
 
-## API Contract
+## API Contract (v2.1)
 
 ```python
-from enum import Enum
-from typing import Callable
-from datetime import datetime
-
-class SchedulerState(Enum):
-    IDLE = "idle"
-    RUNNING = "running"
-    WAITING = "waiting"
-    ERROR = "error"
-    STOPPED = "stopped"
-
 class Scheduler:
-    """
-    Điều phối việc chạy email processing.
-    Chạy trên background thread, giao tiếp với GUI qua callbacks.
-    """
-    
-    def __init__(
-        self,
-        gmail_client: GmailClient,
-        rule_engine: RuleEngine,
-        file_downloader: FileDownloader,
-        link_extractor: LinkExtractor,
-        interval_minutes: int = 30,
-        on_log: Callable[[str, str], None] = None,  # (level, message)
-        on_state_change: Callable[[SchedulerState], None] = None,
-    ):
-        pass
-    
     def run_once(self) -> RunResult:
         """Chạy 1 lần tất cả enabled rules."""
     
-    def start(self) -> None:
-        """Bắt đầu chạy tự động theo interval."""
+    def run_rules(self, rules: list[EmailRule]) -> RunResult:
+        """Chạy 1 hoặc nhiều rule cụ thể."""
     
-    def stop(self) -> None:
-        """Dừng scheduler."""
+    def preview_rules(self, rules: list[EmailRule]) -> PreviewResult:
+        """NEW v2.1 — Quét email + list files (KHÔNG download).
+        
+        Returns:
+            PreviewResult với danh sách email + file dự kiến.
+        """
+    
+    def start(self) -> None
+    def stop(self) -> None
     
     @property
-    def state(self) -> SchedulerState:
-        """Trạng thái hiện tại."""
+    def state(self) -> SchedulerState
     
     @property
-    def next_run(self) -> datetime | None:
-        """Thời gian chạy tiếp theo."""
+    def next_run(self) -> datetime | None
     
     @property
-    def last_result(self) -> RunResult | None:
-        """Kết quả lần chạy gần nhất."""
+    def last_result(self) -> RunResult | None
 ```
 
 ---
 
-## RunResult
+## Preview Flow (NEW v2.1)
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Dashboard
+    participant Scheduler
+    participant Gmail
+
+    User->>Dashboard: Bấm "👁️ Preview"
+    Dashboard->>Scheduler: preview_rules(rules)
+    loop Mỗi rule
+        Scheduler->>Gmail: search emails
+        Gmail-->>Scheduler: email list
+        Scheduler->>Scheduler: list attachments + links
+        Note over Scheduler: KHÔNG download
+    end
+    Scheduler-->>Dashboard: PreviewResult
+    Dashboard->>User: PreviewDialog (email + file list)
+    alt User bấm "Tải ngay"
+        Dashboard->>Scheduler: run_rules(rules)
+    end
+```
+
+---
+
+## Download History (NEW v2.1)
+
+```python
+class DownloadHistory:
+    """Track downloaded files across runs."""
+    FILE = "config/download_history.json"
+    
+    def add_entry(self, rule_name, filename, status, timestamp)
+    def get_entries(self, rule_filter=None, limit=200) -> list[HistoryEntry]
+    def get_stats(self) -> dict:
+        """Return {today: int, week: int, total: int}"""
+    def clear(self)
+```
+
+### Integration:
+- `scheduler._process_rule()` → gọi `history.add_entry()` sau mỗi file
+- `app.py` Stats card → gọi `history.get_stats()`
+- `app.py` HistoryDialog → gọi `history.get_entries()`
+
+---
+
+## Data Models (NEW v2.1)
 
 ```python
 @dataclass
-class RunResult:
-    started_at: datetime
-    finished_at: datetime
-    rules_processed: int
-    emails_found: int
-    attachments_downloaded: int
-    bang_ke_downloaded: int
-    errors: list[str]
-    skipped_duplicates: int
-    
-    @property
-    def duration_seconds(self) -> float:
-        return (self.finished_at - self.started_at).total_seconds()
-    
-    @property
-    def is_success(self) -> bool:
-        return len(self.errors) == 0
+class PreviewItem:
+    rule_name: str
+    rule_icon: str
+    email_subject: str
+    email_date: str
+    files: list[str]      # filenames dự kiến
+    file_sources: list[str]  # "📎 attachment" hoặc "🔗 link"
+
+@dataclass 
+class PreviewResult:
+    items: list[PreviewItem]
+    total_emails: int = 0
+    total_files: int = 0
+    duration_seconds: float = 0.0
+
+@dataclass
+class HistoryEntry:
+    timestamp: str        # ISO format
+    rule_name: str
+    filename: str
+    status: str           # "downloaded" | "skipped" | "error"
 ```
 
 ---
 
-## Scheduling Strategy
-
-```mermaid
-stateDiagram-v2
-    [*] --> IDLE
-    IDLE --> RUNNING: run_once() / start()
-    RUNNING --> IDLE: completed (manual run)
-    RUNNING --> WAITING: completed (auto mode)
-    WAITING --> RUNNING: interval elapsed
-    RUNNING --> ERROR: exception caught
-    ERROR --> IDLE: user acknowledges
-    WAITING --> STOPPED: stop()
-    RUNNING --> STOPPED: stop()
-    STOPPED --> IDLE: reset
-```
-
----
-
-## Error Recovery
+## Error Recovery (unchanged)
 
 | Lỗi | Hành vi |
 |-----|---------|
 | Gmail auth expired | Tự refresh token, nếu fail → báo user |
 | Network error | Retry 3 lần, backoff 2-4-8 giây |
-| Vinvoice.viettel.vn down | Skip bảng kê, log warning, tiếp tục email khác |
+| 1 rule lỗi | Log error, tiếp tục rule tiếp theo |
 | Disk full | Dừng ngay, báo user |
-| Uncaught exception | Log full traceback, set state = ERROR |
-
----
-
-## Logging
-
-```python
-import logging
-
-logger = logging.getLogger("email_auto_download")
-logger.setLevel(logging.INFO)
-
-# File handler — persistent log
-file_handler = logging.FileHandler("logs/app.log", encoding="utf-8")
-file_handler.setFormatter(logging.Formatter(
-    "%(asctime)s [%(levelname)s] %(message)s"
-))
-
-# Queue handler — stream to GUI
-queue_handler = QueueHandler(log_queue)
-
-logger.addHandler(file_handler)
-logger.addHandler(queue_handler)
-```

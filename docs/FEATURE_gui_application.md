@@ -1,171 +1,134 @@
-# FEATURE: GUI Application
+# FEATURE: GUI Application (v2.1)
 
 > Skills áp dụng: `02_python-pro`, `08_clean-code`
 
 ## Mục Đích
 
-Giao diện người dùng desktop sử dụng CustomTkinter, cho phép cấu hình rule, chạy thủ công/tự động, và theo dõi tiến trình.
+Giao diện desktop CustomTkinter — toggle rule, chạy từng rule, preview trước khi tải, lịch sử download, system tray, và đếm ngược.
 
 ---
 
-## Thiết Kế 4 Tabs
-
-### Tab 1: Dashboard
+## Dashboard Tab (v2.1)
 
 ```
-┌──────────────────────────────────────────┐
-│  📊 Dashboard                            │
-├──────────────────────────────────────────┤
-│                                          │
-│  [▶ Run Now]  [⏸ Stop]  [🔄 Refresh]    │
-│                                          │
-│  Status: ● Running / ● Idle / ● Error   │
-│  Last run: 2026-03-10 14:30:05           │
-│  Next run: 2026-03-10 15:00:00           │
-│                                          │
-│  ┌────────────────────────────────────┐  │
-│  │ Log Output (real-time)            │  │
-│  │ [14:30:01] Searching emails...    │  │
-│  │ [14:30:03] Found 3 emails         │  │
-│  │ [14:30:04] ✅ K26TAN2038744.pdf   │  │
-│  │ [14:30:05] ✅ Bảng kê downloaded  │  │
-│  │ [14:30:05] Done. 5 files saved.   │  │
-│  └────────────────────────────────────┘  │
-│                                          │
-│  Summary: 3 emails | 5 files | 0 errors  │
-└──────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│  📊 Dashboard                              v2.1          │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│  [▶ Run] [👁️ Preview] [⏹ Stop] [↻ Reset]               │
+│  [📂 Open ▼] [📋 Lịch sử]    ● Ready    Last: 14:30    │
+│                                                          │
+│  Chạy rule: [▶ Tất cả rule đang bật          ▼]         │
+│                                                          │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │ 📊 Thống kê                                        │  │
+│  │ Hôm nay: 12 files  │  Tuần: 45  │  Tổng: 230      │  │
+│  └────────────────────────────────────────────────────┘  │
+│                                                          │
+│  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░  70%                         │
+│  ⏱ Chạy tiếp sau: 24:35                                 │
+│                                                          │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │ Log Output                                         │  │
+│  │ [14:30:01] Bắt đầu chạy: J&T Express COD          │  │
+│  │ [14:30:02] Found 2 emails...                       │  │
+│  └────────────────────────────────────────────────────┘  │
+│                                                          │
+│  ✅ 1 rules, 2 emails, 2 files (2.7s)                    │
+└──────────────────────────────────────────────────────────┘
 ```
 
-### Tab 2: Rules
+### Tính năng mới v2.1:
+- 👁️ **Preview button** — quét email, hiện danh sách (không tải)
+- 📋 **Lịch sử button** — mở dialog lịch sử download
+- 📊 **Stats card** — thống kê hôm nay / tuần / tổng
+- ⏱️ **Countdown** — đếm ngược tới lần chạy tiếp (auto-schedule)
+
+---
+
+## PreviewDialog (NEW v2.1)
 
 ```
-┌──────────────────────────────────────────┐
-│  📋 Email Rules                          │
-├──────────────────────────────────────────┤
-│                                          │
-│  [+ Add Rule]  [Import]  [Export]        │
-│                                          │
-│  ┌────────────────────────────────────┐  │
-│  │ ☑ Viettel Post Invoice           │  │
-│  │   Subject: Tổng công ty Cổ phần..│  │
-│  │   From: noreply@viettelpost...    │  │
-│  │   Folder: downloads/viettel_post  │  │
-│  │   [Edit] [Delete]                 │  │
-│  ├────────────────────────────────────┤  │
-│  │ ☐ VNPT Invoice (disabled)        │  │
-│  │   Subject: VNPT hóa đơn          │  │
-│  │   [Edit] [Delete] [Enable]        │  │
-│  └────────────────────────────────────┘  │
-└──────────────────────────────────────────┘
-```
-
-### Tab 3: Settings
-
-```
-┌──────────────────────────────────────────┐
-│  ⚙️ Settings                             │
-├──────────────────────────────────────────┤
-│                                          │
-│  Gmail Authentication                    │
-│  Status: ● Connected (ketoan@gmail.com)  │
-│  [Re-authenticate]  [Disconnect]         │
-│                                          │
-│  ──────────────────────────────────────  │
-│                                          │
-│  Download Folder: [D:\Downloads\invoices]│
-│  [Browse...]                             │
-│                                          │
-│  ──────────────────────────────────────  │
-│                                          │
-│  Auto Schedule                           │
-│  ☑ Enable automatic checking             │
-│  Interval: [30] minutes                  │
-│                                          │
-│  ──────────────────────────────────────  │
-│                                          │
-│  Duplicate Check                         │
-│  ☑ Skip already downloaded files         │
-│  ☑ Mark processed emails with label      │
-│  Label name: [AutoDownloaded]            │
-│                                          │
-└──────────────────────────────────────────┘
-```
-
-### Tab 4: History
-
-```
-┌──────────────────────────────────────────┐
-│  📁 Download History                     │
-├──────────────────────────────────────────┤
-│                                          │
-│  Search: [________________] [🔍]        │
-│  Filter: [All Rules ▼] [All Dates ▼]   │
-│                                          │
-│  ┌────┬──────────┬──────────┬────────┐  │
-│  │Date│ Filename │ Rule     │ Status │  │
-│  ├────┼──────────┼──────────┼────────┤  │
-│  │3/10│K26TAN..  │Viettel   │ ✅     │  │
-│  │3/10│0104..xml │Viettel   │ ✅     │  │
-│  │3/10│bangke..  │Viettel   │ ✅     │  │
-│  │3/09│K26TAN..  │Viettel   │ ⏭ Skip│  │
-│  └────┴──────────┴──────────┴────────┘  │
-│                                          │
-│  Total: 47 files | [Open Folder]        │
-│  [Export to Excel]                       │
-└──────────────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│  👁️  Preview — Danh sách email & file        │
+│  Thời gian quét: 1.2s                        │
+│                                              │
+│  📦 Viettel Post Invoice (3 emails)          │
+│  ├─ Email: "HĐ tháng 3/2026"  (16/03)       │
+│  │  └─ 📎 K26TAN2038744.pdf                 │
+│  │  └─ 📎 K26TAN2038744.xml                 │
+│  ├─ Email: "HĐ tháng 3/2026"  (19/03)       │
+│  │  └─ 🔗 Bảng kê chi tiết (link)           │
+│  └─ ...                                      │
+│                                              │
+│  📊 J&T Express COD (2 emails)               │
+│  ├─ Email: "Đối soát COD"  (16/03)           │
+│  │  └─ 📎 251LC17070_COD.xlsx                │
+│  └─ ...                                      │
+│                                              │
+│  Tổng: 5 emails, 8 files dự kiến             │
+│                                              │
+│  [▶ Tải ngay]              [Đóng]            │
+└──────────────────────────────────────────────┘
 ```
 
 ---
 
-## Threading Model
+## HistoryDialog (NEW v2.1)
 
-```python
-import threading
-from queue import Queue
-
-class AppController:
-    def __init__(self):
-        self.log_queue = Queue()  # Thread-safe log messages
-        self.is_running = False
-    
-    def run_now(self):
-        """Chạy processing trên background thread."""
-        if self.is_running:
-            return
-        
-        self.is_running = True
-        thread = threading.Thread(
-            target=self._process_emails,
-            daemon=True
-        )
-        thread.start()
-    
-    def _process_emails(self):
-        """Background thread — KHÔNG gọi GUI trực tiếp."""
-        try:
-            # ... processing logic ...
-            self.log_queue.put(("info", "Found 3 emails"))
-        finally:
-            self.is_running = False
-    
-    def poll_logs(self):
-        """Gọi từ GUI main loop mỗi 100ms."""
-        while not self.log_queue.empty():
-            level, message = self.log_queue.get_nowait()
-            self.update_log_display(level, message)
 ```
-
-**Nguyên tắc:**
-- GUI chỉ chạy trên **main thread**
-- Processing chạy trên **daemon thread**
-- Giao tiếp qua **Queue** (thread-safe)
-- Dùng `after()` của Tkinter để poll queue
+┌──────────────────────────────────────────────┐
+│  📋  Lịch sử tải file                        │
+│                                              │
+│  Lọc: [Tất cả rules  ▼]                     │
+│                                              │
+│  ┌─────────────────────────────────────────┐ │
+│  │ Ngày      │ File          │ Rule │ Status│ │
+│  ├───────────┼───────────────┼──────┼───────┤ │
+│  │ 23/03 18h │ COD_0316.xlsx │ J&T  │  ✅   │ │
+│  │ 23/03 18h │ COD_0319.xlsx │ J&T  │  ✅   │ │
+│  │ 23/03 17h │ K26TAN...pdf  │ VTP  │  ⏭   │ │
+│  └─────────────────────────────────────────┘ │
+│                                              │
+│  Tổng: 230 files  │  [Xóa lịch sử] [Đóng]   │
+└──────────────────────────────────────────────┘
+```
 
 ---
 
-## Dependencies
+## System Tray (NEW v2.1)
 
 ```
-customtkinter>=5.2.0
-Pillow>=10.0.0  # cho icons
+Tray Menu:
+┌─────────────────────┐
+│ 📧 Email Auto-Download │
+│ ─────────────────── │
+│ 📂 Mở ứng dụng     │
+│ ▶  Chạy ngay        │
+│ ⏹  Dừng             │
+│ ─────────────────── │
+│ ❌ Thoát            │
+└─────────────────────┘
+
+Toast: "✅ Email Auto-Download — 5 files đã tải về"
 ```
+
+---
+
+## Settings Tab (v2.1 additions)
+
+```
+│  System                                     │
+│  ☑ Minimize to system tray                  │
+│  ☑ Khởi động cùng Windows                   │
+```
+
+---
+
+## Threading Model (unchanged)
+
+- GUI → main thread
+- Processing → daemon thread
+- Giao tiếp qua Queue (thread-safe)
+- Tray icon → thread riêng (pystray)
+- Countdown timer → `after(1000)` loop

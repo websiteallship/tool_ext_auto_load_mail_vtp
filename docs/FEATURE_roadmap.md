@@ -1,4 +1,4 @@
-# FEATURE: Roadmap & Extensions
+# FEATURE: Roadmap & Extensions (v2.1)
 
 > Skills áp dụng: `04_architecture`
 
@@ -8,77 +8,87 @@ Lộ trình phát triển tính năng, chia thành MVP và các phase mở rộn
 
 ---
 
-## Phase 1: MVP (v1.0) ← Đang triển khai
+## Phase 1: MVP (v1.0) ✅ HOÀN THÀNH
 
 | Tính năng | Module | Trạng thái |
 |-----------|--------|-----------|
-| Kết nối Gmail (OAuth2) | `gmail_client.py` | ⬜ |
-| Tìm email theo tiêu đề | `gmail_client.py` | ⬜ |
-| Tải file đính kèm (PDF, XML) | `file_downloader.py` | ⬜ |
-| Trích xuất link bảng kê | `link_extractor.py` | ⬜ |
-| Tải bảng kê từ URL | `file_downloader.py` | ⬜ |
-| 1 Rule mặc định (Viettel Post) | `rule_engine.py` | ⬜ |
-| GUI cơ bản (Dashboard + Settings) | `app.py` | ⬜ |
-| Log real-time | `scheduler.py` | ⬜ |
-| Build .exe | `build.bat` | ⬜ |
+| Kết nối Gmail (OAuth2) | `gmail_client.py` | ✅ |
+| Tìm email theo tiêu đề | `gmail_client.py` | ✅ |
+| Tải file đính kèm (PDF, XML) | `file_downloader.py` | ✅ |
+| Trích xuất link bảng kê | `link_extractor.py` | ✅ |
+| Tải bảng kê từ URL | `file_downloader.py` | ✅ |
+| 1 Rule mặc định (Viettel Post) | `rule_engine.py` | ✅ |
+| GUI cơ bản (Dashboard + Settings) | `app.py` | ✅ |
+| Log real-time | `scheduler.py` | ✅ |
+| Build .exe | `build.bat` | ✅ |
 
 ---
 
-## Phase 2: Multi-Rule (v1.1)
+## Phase 2–3: Multi-Rule & Automation (v1.1–1.2) ✅ HOÀN THÀNH
 
-| Tính năng | Mô tả |
-|-----------|-------|
-| Nhiều rule email | Hỗ trợ VNPT, FPT, EVN... |
-| GUI Rules tab | Thêm/sửa/xóa rule |
-| Import/Export rules | JSON import/export |
-| Tổ chức thư mục theo rule | `downloads/<rule_name>/` |
-
----
-
-## Phase 3: Automation (v1.2)
-
-| Tính năng | Mô tả |
-|-----------|-------|
-| Chạy tự động theo lịch | Scheduler mỗi 30 phút |
-| Duplicate detection | Skip file đã tải |
-| Email labeling | Gán nhãn "Đã xử lý" |
-| System tray icon | Chạy nền Windows |
-| Windows startup | Auto-start khi boot |
+| Tính năng | Trạng thái |
+|-----------|-----------|
+| Nhiều rule email + GUI Rules tab | ✅ |
+| Completion Dialog (chi tiết file) | ✅ |
+| Chạy tự động theo lịch | ✅ |
+| Duplicate detection | ✅ |
 
 ---
 
-## Phase 4: Analytics (v1.3)
+## Phase 4: Plugin Architecture (v2.0) ✅ HOÀN THÀNH — 2026-03-23
 
-| Tính năng | Mô tả |
-|-----------|-------|
-| History tab | Lịch sử file đã tải |
-| Excel summary export | Tổng hợp danh sách file |
-| Statistics dashboard | Số email/file theo thời gian |
-| Filter by date range | Chỉ xử lý email từ-đến |
+| Tính năng | Trạng thái |
+|-----------|-----------|
+| Handler System (Base + Registry + 4 handlers) | ✅ |
+| Rules Tab redesign (switch + folder picker) | ✅ |
+| Per-rule run selector + Smart Open Folder | ✅ |
+| CompletionDialog per-rule folder buttons | ✅ |
+| Auto-subfolder theo tháng ({YYYYMM}/) | ✅ |
+| Error isolation + Tab change sync | ✅ |
+| 80 unit tests | ✅ |
 
 ---
 
-## Phase 5: Advanced (v2.0)
+## Phase 5: UX Enhancement (v2.1) ← ĐANG TRIỂN KHAI
+
+### 5.1 Preview & History
+
+| Tính năng | Mô tả | Module |
+|-----------|-------|--------|
+| ⬜ 👁️ Dry-run Preview | Quét email → hiện preview (không tải) → bấm "Tải ngay" | `scheduler.py`, `app.py` |
+| ⬜ 📋 Download History | Lịch sử file đã tải, lọc rule/ngày | `download_history.py` (NEW), `app.py` |
+| ⬜ 📊 Stats Summary | Card "Hôm nay: 12 | Tuần: 45 | Tổng: 230" trên Dashboard | `app.py` |
+
+### 5.2 System Integration
+
+| Tính năng | Mô tả | Module |
+|-----------|-------|--------|
+| ⬜ 🔽 System Tray | Minimize → icon tray, menu Mở/Chạy/Dừng/Thoát | `tray_icon.py` (NEW), `app.py` |
+| ⬜ 🔔 Toast Notification | Windows notification khi tải xong + app minimize | `tray_icon.py`, `app.py` |
+| ⬜ 🚀 Windows Startup | Tự khởi động cùng Windows (checkbox) | `app.py` |
+
+### 5.3 Dashboard UX
+
+| Tính năng | Mô tả | Module |
+|-----------|-------|--------|
+| ⬜ ⏱️ Countdown Timer | "Chạy tiếp sau: 24:35" khi auto-schedule bật | `app.py` |
+
+---
+
+## Phase 6: Advanced (v3.0)
 
 | Tính năng | Mô tả |
 |-----------|-------|
 | PDF data extraction | Trích xuất dữ liệu từ hóa đơn PDF |
-| OCR cho file ảnh | Nhận dạng bảng kê dạng ảnh |
-| Windows notification | Toast notification khi có file mới |
 | Multi-account Gmail | Nhiều tài khoản Gmail |
 | IMAP support | Hỗ trợ email ngoài Gmail |
-| Plugin system | Mở rộng thêm handler cho loại email mới |
+| Dark mode | Theme tối cho GUI |
 
 ---
 
 ## Nguyên Tắc Phát Triển
 
-```
-"Start simple, add complexity ONLY when proven necessary."
-                                    — Architecture Skill
-```
-
-1. **Ship MVP first** — tải được file = thành công
+1. **Ship MVP first** — tải được file = thành công ✅
 2. **User feedback** — thêm tính năng theo nhu cầu thực
-3. **Backwards compatible** — config v1.0 phải chạy được trên v2.0
-4. **Data-driven rules** — thêm loại email mới không cần code mới
+3. **Backwards compatible** — config cũ phải chạy được trên version mới
+4. **Plugin per provider** — mỗi nhà cung cấp = 1 handler độc lập
