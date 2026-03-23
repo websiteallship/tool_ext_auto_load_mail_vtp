@@ -29,9 +29,11 @@ import customtkinter as ctk
 from src.file_downloader import FileDownloader
 from src.gmail_client import GmailClient
 from src.link_extractor import LinkExtractor
-from src.models import EmailRule, RunResult, SchedulerState
+from src.models import EmailRule, PreviewResult, RunResult, SchedulerState
 from src.rule_engine import RuleEngine
 from src.scheduler import Scheduler
+from src.download_history import DownloadHistory
+from src.tray_icon import TrayIcon
 
 # ── Logging Setup ────────────────────────────────────────────────────
 
@@ -122,7 +124,7 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("Email Auto-Download Tool v2.0.0")
+        self.title("Email Auto-Download Tool v2.1.0")
         self.geometry("960x680")
         self.minsize(860, 580)
 
@@ -139,6 +141,21 @@ class App(ctk.CTk):
         self.rule_engine.load_rules()
         self.scheduler: Scheduler | None = None
         self._is_running = False
+        # Download history (v2.1)
+        self._history = DownloadHistory()
+
+        # System tray (v2.1)
+        self._tray = TrayIcon(
+            on_show=self._tray_show,
+            on_run=lambda: self.after(0, self._on_run_now),
+            on_stop=lambda: self.after(0, self._on_stop),
+            on_quit=lambda: self.after(0, self._on_quit_app),
+        )
+        if self.settings.get("minimize_to_tray", False) and self._tray.available:
+            self._tray.start()
+
+        # Override close button
+        self.protocol("WM_DELETE_WINDOW", self._on_close)
 
         # Build UI
         self._create_tabs()
@@ -152,6 +169,9 @@ class App(ctk.CTk):
 
         # Auto-connect Gmail if token exists
         self.after(500, self._auto_connect_gmail)
+
+        # Start countdown timer
+        self.after(1000, self._update_countdown)
 
         # Footer
         self._build_footer()
@@ -262,6 +282,23 @@ class App(ctk.CTk):
         self.folder_menu.pack(side="left", padx=(0, 8))
         self._update_folder_menu()
 
+        # History button (v2.1)
+        self.btn_history = ctk.CTkButton(
+            top_frame,
+            text="📋 Lịch sử",
+            command=self._on_show_history,
+            width=90,
+            height=34,
+            fg_color=Colors.CARD,
+            hover_color=Colors.LOG_BG,
+            border_width=1,
+            border_color=Colors.BORDER,
+            text_color=Colors.TEXT,
+            font=("", 12),
+            corner_radius=6,
+        )
+        self.btn_history.pack(side="left", padx=(0, 8))
+
         # Status indicator
         self.lbl_status = ctk.CTkLabel(
             top_frame,
@@ -307,7 +344,24 @@ class App(ctk.CTk):
             values=["▶ Tất cả rule đang bật"],
         )
         self.rule_selector.set("▶ Tất cả rule đang bật")
-        self.rule_selector.pack(side="left", padx=(0, 8))
+        self.rule_selector.pack(side="left", padx=(0, 4))
+
+        # Preview button (v2.1) — next to rule selector
+        self.btn_preview = ctk.CTkButton(
+            selector_frame,
+            text="👁️ Preview",
+            command=self._on_preview,
+            width=90,
+            height=32,
+            fg_color=Colors.CARD,
+            hover_color=Colors.LOG_BG,
+            border_width=1,
+            border_color=Colors.BORDER,
+            text_color=Colors.TEXT,
+            font=("", 12),
+            corner_radius=6,
+        )
+        self.btn_preview.pack(side="left", padx=(0, 8))
 
         # Populate rule selector with enabled rules
         self._update_rule_selector()
@@ -340,6 +394,47 @@ class App(ctk.CTk):
             font=("", 11),
         )
         self.lbl_progress.pack(anchor="e")
+
+        # ── Stats summary card (v2.1) ────────────
+        self.stats_card = ctk.CTkFrame(
+            tab, fg_color="#EBF8FF", corner_radius=8,
+            border_color="#BEE3F8", border_width=1,
+        )
+        self.stats_card.pack(fill="x", padx=12, pady=(0, 4))
+
+        stats_inner = ctk.CTkFrame(self.stats_card, fg_color="transparent")
+        stats_inner.pack(fill="x", padx=12, pady=6)
+
+        ctk.CTkLabel(
+            stats_inner, text="📊", font=("", 14),
+        ).pack(side="left", padx=(0, 6))
+
+        self.lbl_stats_today = ctk.CTkLabel(
+            stats_inner, text="Hôm nay: 0",
+            font=("", 12, "bold"), text_color=Colors.PRIMARY,
+        )
+        self.lbl_stats_today.pack(side="left", padx=(0, 16))
+
+        self.lbl_stats_week = ctk.CTkLabel(
+            stats_inner, text="Tuần: 0",
+            font=("", 12), text_color=Colors.TEXT,
+        )
+        self.lbl_stats_week.pack(side="left", padx=(0, 16))
+
+        self.lbl_stats_total = ctk.CTkLabel(
+            stats_inner, text="Tổng: 0",
+            font=("", 12), text_color=Colors.TEXT_MUTED,
+        )
+        self.lbl_stats_total.pack(side="left")
+
+        # Countdown label (v2.1)
+        self.lbl_countdown = ctk.CTkLabel(
+            stats_inner, text="",
+            font=("", 11), text_color=Colors.ACCENT,
+        )
+        self.lbl_countdown.pack(side="right")
+
+        self._update_stats_card()
 
         # ── Log area (single, no nested tab) ────
         log_frame = ctk.CTkFrame(
@@ -757,6 +852,43 @@ class App(ctk.CTk):
             self.chk_skip_dup.select()
         self.chk_skip_dup.pack(anchor="w")
 
+        # ── System (v2.1) ────────────────────────
+        self._section_label(scroll, "System")
+
+        sys_card = ctk.CTkFrame(
+            scroll,
+            fg_color=Colors.LOG_BG,
+            corner_radius=8,
+            border_color=Colors.BORDER,
+            border_width=1,
+        )
+        sys_card.pack(fill="x", pady=6)
+
+        sys_inner = ctk.CTkFrame(sys_card, fg_color="transparent")
+        sys_inner.pack(fill="x", padx=12, pady=10)
+
+        self.chk_tray = ctk.CTkCheckBox(
+            sys_inner,
+            text="Minimize to system tray",
+            text_color=Colors.TEXT,
+            fg_color=Colors.PRIMARY,
+            hover_color=Colors.PRIMARY_HOVER,
+        )
+        if self.settings.get("minimize_to_tray", False):
+            self.chk_tray.select()
+        self.chk_tray.pack(anchor="w", pady=(0, 6))
+
+        self.chk_startup = ctk.CTkCheckBox(
+            sys_inner,
+            text="Khởi động cùng Windows",
+            text_color=Colors.TEXT,
+            fg_color=Colors.PRIMARY,
+            hover_color=Colors.PRIMARY_HOVER,
+        )
+        if self.settings.get("windows_startup", False):
+            self.chk_startup.select()
+        self.chk_startup.pack(anchor="w")
+
         # ── Save ─────────────────────────────────
         ctk.CTkButton(
             scroll,
@@ -800,7 +932,7 @@ class App(ctk.CTk):
         title_frame.pack(fill="x", pady=(0, 12))
 
         ctk.CTkLabel(
-            title_frame, text="📖  Hướng Dẫn Sử Dụng — v2.0",
+            title_frame, text="📖  Hướng Dẫn Sử Dụng — v2.1",
             font=("", 20, "bold"), text_color=Colors.PRIMARY,
         ).pack(anchor="w", padx=16, pady=(14, 2))
 
@@ -834,24 +966,36 @@ class App(ctk.CTk):
         ])
 
         # Step 3
-        self._help_section(scroll, "Bước 3 — Cài đặt thư mục & lịch tự động", [
+        self._help_section(scroll, "Bước 3 — Cài đặt & hệ thống", [
             ("📁", "Thư mục mặc định",
              "Vào Settings → mục Download Folder.\n"
-             "Nhấn Browse... để chọn thư mục mặc định (dùng khi rule chưa chọn folder riêng)."),
+             "Nhấn Browse... để chọn thư mục mặc định."),
             ("⏰", "Lịch tự động (Auto Schedule)",
              "Bật Enable automatic checking để ứng dụng tự chạy định kỳ.\n"
-             "Đặt Interval (phút) — ví dụ 30 = kiểm tra email mỗi 30 phút."),
+             "Đặt Interval (phút) — ví dụ 30 = kiểm tra email mỗi 30 phút.\n"
+             "⏱ Dashboard sẽ hiện đếm ngược tới lần chạy tiếp theo."),
+            ("🔽", "Minimize to tray",
+             "Bật 'Minimize to system tray' trong Settings → System.\n"
+             "Khi đóng cửa sổ → app ẩn xuống tray (icon gần đồng hồ).\n"
+             "Khi tải xong → Windows sẽ hiện thông báo tự động."),
+            ("🚀", "Khởi động cùng Windows",
+             "Bật 'Khởi động cùng Windows' trong Settings → System.\n"
+             "App sẽ tự chạy khi bật máy tính."),
             ("💾", "Lưu cài đặt",
              "Nhấn Save Settings sau khi thay đổi."),
         ])
 
-        # Step 4 — Per-rule run
-        self._help_section(scroll, "Bước 4 — Chạy và theo dõi", [
+        # Step 4 — Preview & Run
+        self._help_section(scroll, "Bước 4 — Preview và chạy", [
             ("🎯", "Chọn rule cần chạy",
              "Trên Dashboard, dropdown 'Chạy rule' cho phép:\n"
              "• Chọn 'Tất cả rule đang bật' → chạy tuần tự tất cả\n"
              "• Chọn 1 rule cụ thể → chỉ chạy rule đó\n"
              "⚠ Rule tắt hiện '✗ TẮT' — phải bật ở tab Rules trước."),
+            ("👁️", "Preview trước khi tải (MỚI v2.1)",
+             "Bấm nút 👁️ → app quét email nhưng KHÔNG tải.\n"
+             "Hiện danh sách email + file dự kiến.\n"
+             "Xem xong → bấm 'Tải ngay' hoặc 'Đóng'."),
             ("▶", "Bấm Run Now",
              "Ứng dụng sẽ duyệt Gmail theo rule đã chọn.\n"
              "Thanh progress bar hiển thị tiến độ.\n"
@@ -860,18 +1004,21 @@ class App(ctk.CTk):
              "Nhấn Stop bất cứ lúc nào để dừng quá trình."),
         ])
 
-        # Step 5 — Folder & results
-        self._help_section(scroll, "Bước 5 — Xem kết quả & thư mục", [
+        # Step 5 — Results & History
+        self._help_section(scroll, "Bước 5 — Kết quả & lịch sử", [
             ("📊", "Dialog hoàn tất",
              "Sau khi chạy xong, dialog hiện:\n"
              "• Số email, file đã tải, file bỏ qua (trùng)\n"
-             "• Chi tiết từng file (tên, trạng thái)\n"
              "• Nút mở thư mục cho từng rule đã chạy."),
             ("📂", "Mở folder bất kỳ lúc nào",
              "Trên Dashboard, bấm '📂 Open Folder ▼' → chọn:\n"
              "• Folder mặc định\n"
              "• Folder riêng của từng rule (VTP, J&T...)\n"
              "Click → mở folder trong File Explorer."),
+            ("📋", "Lịch sử tải file (MỚI v2.1)",
+             "Bấm nút 📋 → xem danh sách file đã tải.\n"
+             "Lọc theo rule, xem ngày giờ & trạng thái.\n"
+             "Bảng thống kê: Hôm nay / Tuần / Tổng hiện trên Dashboard."),
             ("↻", "Reset lịch sử",
              "Nhấn Reset để xóa danh sách email đã xử lý.\n"
              "⚠ Lần chạy tiếp theo sẽ tải lại TẤT CẢ email phù hợp."),
@@ -1018,8 +1165,10 @@ class App(ctk.CTk):
         )
         self._queue_log("info", "Gmail disconnected")
 
-    def _on_tab_changed(self, tab_name: str) -> None:
+    def _on_tab_changed(self, tab_name: str = "") -> None:
         """Refresh Dashboard data when user switches to it."""
+        if not tab_name:
+            tab_name = self.tabview.get()
         if tab_name == "Dashboard":
             # Reload rules from disk to pick up external edits
             self.rule_engine.load_rules()
@@ -1189,6 +1338,17 @@ class App(ctk.CTk):
             output_dir = Path(self.settings.get("output_dir", "downloads"))
             rules_run = getattr(self, "_last_rules_run", [])
             CompletionDialog(self, last, output_dir, rules_run=rules_run)
+
+            # Tray notification (v2.1)
+            total_files = last.attachments_downloaded + last.bang_ke_downloaded
+            self._tray.notify(
+                "Email Auto-Download",
+                f"✅ {total_files} files đã tải, {last.skipped_duplicates} bỏ qua",
+            )
+
+            # Refresh stats card
+            self._history.reload()
+            self._update_stats_card()
         else:
             self._set_status("● Ready", Colors.TEXT_MUTED)
 
@@ -1247,6 +1407,8 @@ class App(ctk.CTk):
         self.settings["output_dir"] = self.entry_output_dir.get()
         self.settings["auto_schedule_enabled"] = bool(self.chk_auto.get())
         self.settings["skip_duplicates"] = bool(self.chk_skip_dup.get())
+        self.settings["minimize_to_tray"] = bool(self.chk_tray.get())
+        self.settings["windows_startup"] = bool(self.chk_startup.get())
         try:
             self.settings["schedule_interval_minutes"] = int(
                 self.entry_interval.get()
@@ -1255,6 +1417,16 @@ class App(ctk.CTk):
             self.settings["schedule_interval_minutes"] = 30
 
         save_settings(self.settings)
+
+        # Apply tray setting
+        if self.settings["minimize_to_tray"] and self._tray.available:
+            self._tray.start()
+        else:
+            self._tray.stop()
+
+        # Apply startup setting
+        self._set_windows_startup(self.settings["windows_startup"])
+
         messagebox.showinfo("Saved", "Settings saved successfully.")
 
     def _on_reset_history(self) -> None:
@@ -1337,6 +1509,131 @@ class App(ctk.CTk):
         finally:
             self.after(200, self._poll_logs)
 
+    # ── Preview & History (v2.1) ──────────────────────────────────────
+
+    def _on_preview(self) -> None:
+        """Run dry-run preview in background thread."""
+        if self._is_running:
+            return
+        if not self.gmail.is_authenticated:
+            messagebox.showwarning(
+                "Chưa kết nối",
+                "Vui lòng kết nối Gmail trong tab Settings trước.",
+            )
+            return
+
+        rules_to_run = self._get_selected_rules()
+        if not rules_to_run:
+            return
+
+        self._set_status("● Previewing...", Colors.ACCENT)
+        self.btn_preview.configure(state="disabled")
+
+        output_dir = Path(self.settings.get("output_dir", "downloads"))
+        scheduler = Scheduler(
+            gmail_client=self.gmail,
+            rule_engine=self.rule_engine,
+            output_dir=output_dir,
+            on_log=self._queue_log,
+        )
+
+        def _worker():
+            result = scheduler.preview_rules(rules_to_run)
+            self.after(0, lambda: self._on_preview_done(result, rules_to_run))
+
+        threading.Thread(target=_worker, daemon=True).start()
+
+    def _on_preview_done(self, result: PreviewResult, rules: list) -> None:
+        """Show PreviewDialog when preview completes."""
+        self.btn_preview.configure(state="normal")
+        self._set_status("● Ready", Colors.TEXT_MUTED)
+        PreviewDialog(self, result, rules, self._on_run_now)
+
+    def _on_show_history(self) -> None:
+        """Open download history dialog."""
+        self._history.reload()
+        HistoryDialog(self, self._history, self.rule_engine.rules)
+
+    # ── Stats & Countdown (v2.1) ──────────────────────────────────────
+
+    def _update_stats_card(self) -> None:
+        """Refresh stats labels from download history."""
+        try:
+            stats = self._history.get_stats()
+            self.lbl_stats_today.configure(text=f"Hôm nay: {stats['today']}")
+            self.lbl_stats_week.configure(text=f"Tuần: {stats['week']}")
+            self.lbl_stats_total.configure(text=f"Tổng: {stats['total']}")
+        except Exception:
+            pass
+
+    def _update_countdown(self) -> None:
+        """Update countdown timer label (called every 1s)."""
+        try:
+            if (self.scheduler and self.scheduler.next_run
+                    and not self._is_running):
+                remaining = (self.scheduler.next_run - datetime.now()).total_seconds()
+                if remaining > 0:
+                    mins, secs = divmod(int(remaining), 60)
+                    self.lbl_countdown.configure(
+                        text=f"⏱ Chạy tiếp sau: {mins:02d}:{secs:02d}"
+                    )
+                else:
+                    self.lbl_countdown.configure(text="⏱ Đang chạy...")
+            else:
+                self.lbl_countdown.configure(text="")
+        except Exception:
+            pass
+        finally:
+            self.after(1000, self._update_countdown)
+
+    # ── Tray & Window (v2.1) ──────────────────────────────────────────
+
+    def _on_close(self) -> None:
+        """Handle window close — minimize to tray or quit."""
+        if self.settings.get("minimize_to_tray", False) and self._tray.available:
+            self.withdraw()  # Hide window
+            self._tray.update_tooltip("Email Auto-Download — đang chạy nền")
+        else:
+            self._on_quit_app()
+
+    def _tray_show(self) -> None:
+        """Restore window from tray."""
+        self.after(0, lambda: (self.deiconify(), self.lift(), self.focus_force()))
+
+    def _on_quit_app(self) -> None:
+        """Fully quit the application."""
+        self._tray.stop()
+        self.destroy()
+
+    def _set_windows_startup(self, enable: bool) -> None:
+        """Create/remove shortcut in Windows Startup folder."""
+        if platform.system() != "Windows":
+            return
+        try:
+            import winreg
+            key = winreg.OpenKey(
+                winreg.HKEY_CURRENT_USER,
+                r"Software\Microsoft\Windows\CurrentVersion\Run",
+                0,
+                winreg.KEY_SET_VALUE,
+            )
+            app_name = "EmailAutoDownload"
+            if enable:
+                exe_path = str(Path(os.sys.executable).resolve())
+                script_path = str(Path("app.py").resolve())
+                winreg.SetValueEx(
+                    key, app_name, 0, winreg.REG_SZ,
+                    f'"{exe_path}" "{script_path}"',
+                )
+            else:
+                try:
+                    winreg.DeleteValue(key, app_name)
+                except FileNotFoundError:
+                    pass
+            winreg.CloseKey(key)
+        except Exception as e:
+            logger.warning(f"Windows startup setting failed: {e}")
+
 
 # ── Completion Dialog ────────────────────────────────────────────────
 
@@ -1367,7 +1664,8 @@ class CompletionDialog(ctk.CTkToplevel):
         base_h += 80  # folder buttons section always visible
         if has_multi_rules:
             base_h += 40 * len(self._rules_run)
-        self.geometry(f"480x{min(base_h, 700)}")
+        self._dw, self._dh = 480, min(base_h, 700)
+        self.geometry(f"{self._dw}x{self._dh}")
 
         # ── Header card ────────────────────────────
         if total_files > 0 and not has_errors:
@@ -1543,13 +1841,15 @@ class CompletionDialog(ctk.CTkToplevel):
             corner_radius=8,
         ).pack(pady=(8, 16))
 
-        # Center on screen
+        # Center on screen using known dimensions
         self.update_idletasks()
-        w = self.winfo_width()
-        h = self.winfo_height()
-        sx = (self.winfo_screenwidth() - w) // 2
-        sy = (self.winfo_screenheight() - h) // 2
+        sx = (self.winfo_screenwidth() - self._dw) // 2
+        sy = (self.winfo_screenheight() - self._dh) // 2
         self.geometry(f"+{sx}+{sy}")
+        self.after(150, lambda: (
+            self.lift(),
+            self.focus_force(),
+        ))
 
     def _open_folder(self) -> None:
         open_folder(self._output_dir)
@@ -1560,6 +1860,292 @@ class CompletionDialog(ctk.CTkToplevel):
 
 # RuleDialog removed in v2.0 — rules are now dev-configured only.
 # Users control rules via toggle switch and folder picker on the Rules tab.
+
+
+# ── Preview Dialog (v2.1) ────────────────────────────────────────────
+
+class PreviewDialog(ctk.CTkToplevel):
+    """Show preview scan results — emails and files that would be downloaded."""
+
+    def __init__(self, parent, result: PreviewResult, rules: list, on_run_now=None):
+        super().__init__(parent)
+        self.title("👁️ Preview — Danh sách email & file")
+        self.transient(parent)
+        self.resizable(True, True)
+        self._on_run_now = on_run_now
+
+        w, h = 550, 480
+        self.geometry(f"{w}x{h}")
+
+        main = ctk.CTkFrame(self, fg_color=Colors.CARD, corner_radius=0)
+        main.pack(fill="both", expand=True)
+
+        # Header
+        header = ctk.CTkFrame(main, fg_color="#EBF8FF", corner_radius=0)
+        header.pack(fill="x")
+
+        ctk.CTkLabel(
+            header, text="👁️  Preview — Danh sách email & file",
+            font=("", 16, "bold"), text_color=Colors.PRIMARY,
+        ).pack(anchor="w", padx=16, pady=(12, 4))
+
+        ctk.CTkLabel(
+            header,
+            text=f"Thời gian quét: {result.duration_seconds:.1f}s",
+            font=("", 11), text_color=Colors.TEXT_MUTED,
+        ).pack(anchor="w", padx=16, pady=(0, 10))
+
+        # Scrollable content
+        scroll = ctk.CTkScrollableFrame(
+            main, fg_color=Colors.LOG_BG, corner_radius=0,
+        )
+        scroll.pack(fill="both", expand=True, padx=8, pady=4)
+
+        if not result.items:
+            ctk.CTkLabel(
+                scroll, text="✅ Không tìm thấy email mới nào.",
+                font=("", 13), text_color=Colors.TEXT_MUTED,
+            ).pack(pady=30)
+        else:
+            # Show ALL scanned rules (even with 0 results)
+            for rule_name, rule_icon in result.rules_scanned:
+                rule_items = [i for i in result.items if i.rule_name == rule_name]
+                count = len(rule_items)
+
+                ctk.CTkLabel(
+                    scroll,
+                    text=f"{rule_icon} {rule_name} ({count} emails)",
+                    font=("", 13, "bold"), text_color=Colors.TEXT,
+                ).pack(anchor="w", padx=8, pady=(10, 2))
+
+                if not rule_items:
+                    ctk.CTkLabel(
+                        scroll,
+                        text="    ✅ Không có email mới",
+                        font=("", 11), text_color=Colors.TEXT_MUTED,
+                    ).pack(anchor="w", padx=16, pady=(0, 4))
+                    continue
+
+                for item in rule_items:
+                    # Email line
+                    ctk.CTkLabel(
+                        scroll,
+                        text=f"  📨 {item.email_subject}  ({item.email_date})",
+                        font=("", 12), text_color=Colors.TEXT,
+                    ).pack(anchor="w", padx=16, pady=(2, 0))
+
+                    # File lines
+                    for fname, src in zip(item.files, item.file_sources):
+                        ctk.CTkLabel(
+                            scroll,
+                            text=f"      {src} {fname}",
+                            font=("Consolas", 11), text_color=Colors.TEXT_MUTED,
+                        ).pack(anchor="w", padx=24, pady=0)
+
+        # Footer
+        footer = ctk.CTkFrame(main, fg_color="transparent")
+        footer.pack(fill="x", padx=12, pady=10)
+
+        ctk.CTkLabel(
+            footer,
+            text=f"Tổng: {result.total_emails} emails, {result.total_files} files dự kiến",
+            font=("", 12, "bold"), text_color=Colors.TEXT,
+        ).pack(side="left")
+
+        ctk.CTkButton(
+            footer, text="Đóng", command=self.destroy,
+            width=80, height=32, fg_color=Colors.SIDEBAR,
+            hover_color=Colors.BORDER, text_color=Colors.TEXT,
+            corner_radius=6,
+        ).pack(side="right", padx=(8, 0))
+
+        if result.total_files > 0 and on_run_now:
+            ctk.CTkButton(
+                footer, text="▶ Tải ngay", command=self._run_and_close,
+                width=100, height=32, fg_color=Colors.PRIMARY,
+                hover_color=Colors.PRIMARY_HOVER, text_color="#FFFFFF",
+                font=("", 12, "bold"), corner_radius=6,
+            ).pack(side="right")
+
+        # Center & force on top
+        self.update_idletasks()
+        sx = (self.winfo_screenwidth() - w) // 2
+        sy = (self.winfo_screenheight() - h) // 2
+        self.geometry(f"+{sx}+{sy}")
+        self.after(150, lambda: (
+            self.lift(),
+            self.grab_set(),
+            self.focus_force(),
+        ))
+
+    def _run_and_close(self) -> None:
+        self.destroy()
+        if self._on_run_now:
+            self._on_run_now()
+
+
+# ── History Dialog (v2.1) ────────────────────────────────────────────
+
+class HistoryDialog(ctk.CTkToplevel):
+    """Show download history with rule filtering."""
+
+    def __init__(self, parent, history, rules: list):
+        super().__init__(parent)
+        self.title("📋 Lịch sử tải file")
+        self.transient(parent)
+        self._parent = parent
+        self._history = history
+        self._rules = rules
+
+        w, h = 600, 500
+        self.geometry(f"{w}x{h}")
+        self.resizable(True, True)
+        self._dialog_w, self._dialog_h = w, h
+
+        main = ctk.CTkFrame(self, fg_color=Colors.CARD, corner_radius=0)
+        main.pack(fill="both", expand=True)
+
+        # Header
+        header = ctk.CTkFrame(main, fg_color="#EBF8FF", corner_radius=0)
+        header.pack(fill="x")
+
+        ctk.CTkLabel(
+            header, text="📋  Lịch sử tải file",
+            font=("", 16, "bold"), text_color=Colors.PRIMARY,
+        ).pack(anchor="w", padx=16, pady=(12, 4))
+
+        # Filter row
+        filter_frame = ctk.CTkFrame(header, fg_color="transparent")
+        filter_frame.pack(fill="x", padx=16, pady=(0, 10))
+
+        ctk.CTkLabel(
+            filter_frame, text="Lọc:", font=("", 12),
+            text_color=Colors.TEXT,
+        ).pack(side="left", padx=(0, 6))
+
+        rule_names = ["Tất cả rules"] + [r.name for r in rules]
+        self._filter_var = ctk.StringVar(value="Tất cả rules")
+        self._filter_menu = ctk.CTkOptionMenu(
+            filter_frame, variable=self._filter_var,
+            values=rule_names, command=self._on_filter_change,
+            width=200, height=28,
+            fg_color=Colors.LOG_BG, button_color=Colors.SIDEBAR,
+            text_color=Colors.TEXT, font=("", 12), corner_radius=6,
+        )
+        self._filter_menu.pack(side="left")
+
+        # Scrollable table
+        self._scroll = ctk.CTkScrollableFrame(
+            main, fg_color=Colors.LOG_BG, corner_radius=0,
+        )
+        self._scroll.pack(fill="both", expand=True, padx=8, pady=4)
+
+        self._populate()
+
+        # Footer
+        footer = ctk.CTkFrame(main, fg_color="transparent")
+        footer.pack(fill="x", padx=12, pady=10)
+
+        stats = history.get_stats()
+        ctk.CTkLabel(
+            footer,
+            text=f"Tổng: {stats['total']} files đã tải",
+            font=("", 12, "bold"), text_color=Colors.TEXT,
+        ).pack(side="left")
+
+        ctk.CTkButton(
+            footer, text="Đóng", command=self.destroy,
+            width=80, height=32, fg_color=Colors.SIDEBAR,
+            hover_color=Colors.BORDER, text_color=Colors.TEXT,
+            corner_radius=6,
+        ).pack(side="right", padx=(8, 0))
+
+        ctk.CTkButton(
+            footer, text="Xóa lịch sử", command=self._clear_history,
+            width=100, height=32, fg_color=Colors.DANGER,
+            hover_color="#C53030", text_color="#FFFFFF",
+            corner_radius=6,
+        ).pack(side="right")
+
+        # Center & force on top
+        self.update_idletasks()
+        sx = (self.winfo_screenwidth() - self._dialog_w) // 2
+        sy = (self.winfo_screenheight() - self._dialog_h) // 2
+        self.geometry(f"+{sx}+{sy}")
+        self.after(150, lambda: (
+            self.lift(),
+            self.grab_set(),
+            self.focus_force(),
+        ))
+
+    def _populate(self, rule_filter: str | None = None) -> None:
+        """Fill the scrollable frame with history entries."""
+        for widget in self._scroll.winfo_children():
+            widget.destroy()
+
+        entries = self._history.get_entries(rule_filter=rule_filter)
+
+        if not entries:
+            ctk.CTkLabel(
+                self._scroll, text="Chưa có lịch sử tải file.",
+                font=("", 13), text_color=Colors.TEXT_MUTED,
+            ).pack(pady=30)
+            return
+
+        # Table header
+        hdr = ctk.CTkFrame(self._scroll, fg_color=Colors.SIDEBAR, corner_radius=4)
+        hdr.pack(fill="x", pady=(0, 4))
+        for col, w_pct in [("Ngày giờ", 130), ("File", 240), ("Rule", 100), ("", 40)]:
+            ctk.CTkLabel(
+                hdr, text=col, font=("", 11, "bold"),
+                text_color=Colors.TEXT, width=w_pct,
+            ).pack(side="left", padx=4, pady=4)
+
+        # Rows
+        status_icons = {"downloaded": "✅", "skipped": "⏭", "error": "❌"}
+        for entry in entries[:200]:
+            row = ctk.CTkFrame(self._scroll, fg_color="transparent", height=24)
+            row.pack(fill="x", pady=1)
+
+            # Parse timestamp
+            try:
+                ts = datetime.fromisoformat(entry.timestamp)
+                ts_text = ts.strftime("%d/%m %Hh%M")
+            except (ValueError, TypeError):
+                ts_text = entry.timestamp[:16]
+
+            icon = status_icons.get(entry.status, "❓")
+
+            ctk.CTkLabel(
+                row, text=ts_text, font=("", 11),
+                text_color=Colors.TEXT_MUTED, width=130, anchor="w",
+            ).pack(side="left", padx=4)
+
+            ctk.CTkLabel(
+                row, text=entry.filename[:35], font=("Consolas", 11),
+                text_color=Colors.TEXT, width=240, anchor="w",
+            ).pack(side="left", padx=4)
+
+            ctk.CTkLabel(
+                row, text=entry.rule_name[:15], font=("", 11),
+                text_color=Colors.TEXT_MUTED, width=100, anchor="w",
+            ).pack(side="left", padx=4)
+
+            ctk.CTkLabel(
+                row, text=icon, font=("", 12), width=40,
+            ).pack(side="left", padx=4)
+
+    def _on_filter_change(self, selection: str) -> None:
+        rule_filter = None if selection == "Tất cả rules" else selection
+        self._populate(rule_filter)
+
+    def _clear_history(self) -> None:
+        if messagebox.askyesno("Xóa lịch sử", "Xóa toàn bộ lịch sử tải file?"):
+            self._history.clear()
+            self._populate()
+            # Refresh Dashboard stats card
+            if hasattr(self._parent, '_update_stats_card'):
+                self._parent._update_stats_card()
 
 
 # ── Entry Point ──────────────────────────────────────────────────────

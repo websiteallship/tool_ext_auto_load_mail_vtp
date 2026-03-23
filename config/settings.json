@@ -5,5 +5,7 @@
   "skip_duplicates": true,
   "mark_processed_label": "AutoDownloaded",
   "auth_method": "oauth2",
-  "log_level": "INFO"
+  "log_level": "INFO",
+  "minimize_to_tray": true,
+  "windows_startup": false
 }

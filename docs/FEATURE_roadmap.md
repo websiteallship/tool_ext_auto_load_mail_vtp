@@ -49,29 +49,29 @@ Lộ trình phát triển tính năng, chia thành MVP và các phase mở rộn
 
 ---
 
-## Phase 5: UX Enhancement (v2.1) ← ĐANG TRIỂN KHAI
+## Phase 5: UX Enhancement (v2.1) ✅ HOÀN THÀNH
 
 ### 5.1 Preview & History
 
 | Tính năng | Mô tả | Module |
 |-----------|-------|--------|
-| ⬜ 👁️ Dry-run Preview | Quét email → hiện preview (không tải) → bấm "Tải ngay" | `scheduler.py`, `app.py` |
-| ⬜ 📋 Download History | Lịch sử file đã tải, lọc rule/ngày | `download_history.py` (NEW), `app.py` |
-| ⬜ 📊 Stats Summary | Card "Hôm nay: 12 | Tuần: 45 | Tổng: 230" trên Dashboard | `app.py` |
+| ✅ 👁️ Dry-run Preview | Quét email → hiện preview (không tải) → bấm "Tải ngay" | `scheduler.py`, `app.py` |
+| ✅ 📋 Download History | Lịch sử file đã tải, lọc rule/ngày | `download_history.py`, `app.py` |
+| ✅ 📊 Stats Summary | Card "Hôm nay: 12 | Tuần: 45 | Tổng: 230" trên Dashboard | `app.py` |
 
 ### 5.2 System Integration
 
 | Tính năng | Mô tả | Module |
 |-----------|-------|--------|
-| ⬜ 🔽 System Tray | Minimize → icon tray, menu Mở/Chạy/Dừng/Thoát | `tray_icon.py` (NEW), `app.py` |
-| ⬜ 🔔 Toast Notification | Windows notification khi tải xong + app minimize | `tray_icon.py`, `app.py` |
-| ⬜ 🚀 Windows Startup | Tự khởi động cùng Windows (checkbox) | `app.py` |
+| ✅ 🔽 System Tray | Minimize → icon tray, menu Mở/Chạy/Dừng/Thoát | `tray_icon.py`, `app.py` |
+| ✅ 🔔 Toast Notification | Windows notification khi tải xong + app minimize | `tray_icon.py`, `app.py` |
+| ✅ 🚀 Windows Startup | Tự khởi động cùng Windows (checkbox) | `app.py` |
 
 ### 5.3 Dashboard UX
 
 | Tính năng | Mô tả | Module |
 |-----------|-------|--------|
-| ⬜ ⏱️ Countdown Timer | "Chạy tiếp sau: 24:35" khi auto-schedule bật | `app.py` |
+| ✅ ⏱️ Countdown Timer | "Chạy tiếp sau: 24:35" khi auto-schedule bật | `app.py` |
 
 ---
 

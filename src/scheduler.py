@@ -27,6 +27,8 @@ from src.models import (
     AuthError,
     DownloadStatus,
     EmailRule,
+    PreviewItem,
+    PreviewResult,
     RunResult,
     SchedulerState,
 )
@@ -75,6 +77,10 @@ class Scheduler:
         self._link_extractor = LinkExtractor()
         self._processed_ids: set[str] = set()
         self._load_processed_ids()
+
+        # Download history (v2.1)
+        from src.download_history import DownloadHistory
+        self._history = DownloadHistory()
 
     @property
     def state(self) -> SchedulerState:
@@ -141,6 +147,72 @@ class Scheduler:
                     pass
 
         return result
+
+    def preview_rules(self, rules: list[EmailRule]) -> PreviewResult:
+        """Dry-run: scan emails and list files WITHOUT downloading."""
+        started = datetime.now()
+        preview = PreviewResult()
+
+        try:
+            for rule in rules:
+                if self._stop_event.is_set():
+                    break
+                handler = get_handler(rule.handler_type)
+                config = handler.resolve_config(rule.extraction_config)
+                self._log("info", f"Preview: scanning {rule.name}...")
+                preview.rules_scanned.append((rule.name, rule.icon or "📧"))
+
+                try:
+                    query = rule.to_gmail_query()
+                    emails = self.gmail.search_emails(query, max_results=rule.max_emails)
+
+                    for email in emails:
+                        if email.id in self._processed_ids:
+                            continue
+                        item = PreviewItem(
+                            rule_name=rule.name,
+                            rule_icon=rule.icon or "📧",
+                            email_subject=email.subject[:80],
+                            email_date=email.date.strftime("%d/%m") if email.date else "",
+                        )
+
+                        # List attachments
+                        if config.download_attachments:
+                            try:
+                                attachments = self.gmail.get_attachments(email.id)
+                                filtered = handler.filter_attachments(attachments, config)
+                                for att in filtered:
+                                    item.files.append(att.filename)
+                                    item.file_sources.append("📎")
+                            except Exception:
+                                pass
+
+                        # List links
+                        if config.download_links:
+                            try:
+                                body = self.gmail.get_email_body(email.id)
+                                if body:
+                                    targets = handler.extract_download_links(body, config)
+                                    for t in targets:
+                                        item.files.append(t.filename_hint or t.context or "link")
+                                        item.file_sources.append("🔗")
+                            except Exception:
+                                pass
+
+                        if item.files:
+                            preview.items.append(item)
+                            preview.total_emails += 1
+                            preview.total_files += len(item.files)
+
+                except Exception as e:
+                    self._log("warning", f"Preview rule '{rule.name}' failed: {e}")
+                    preview.errors.append(f"{rule.name}: {e}")
+
+        finally:
+            preview.duration_seconds = (datetime.now() - started).total_seconds()
+
+        self._log("info", f"Preview done: {preview.total_emails} emails, {preview.total_files} files ({preview.duration_seconds:.1f}s)")
+        return preview
 
     def start(self) -> None:
         """Start auto-scheduled processing in background thread."""
@@ -254,9 +326,11 @@ class Scheduler:
                         if dl_result.status == DownloadStatus.SUCCESS:
                             result.attachments_downloaded += 1
                             result.downloaded_files.append(att.filename)
+                            self._history.add_entry(rule.name, att.filename, "downloaded")
                         elif dl_result.status == DownloadStatus.SKIPPED_DUPLICATE:
                             result.skipped_duplicates += 1
                             result.skipped_files.append(att.filename)
+                            self._history.add_entry(rule.name, att.filename, "skipped")
                     except Exception as e:
                         self._log("warning", f"    Attachment error ({att.filename}): {e}")
                         result.errors.append(f"Attachment {att.filename}: {e}")
@@ -280,9 +354,11 @@ class Scheduler:
                         if dl_result.status == DownloadStatus.SUCCESS:
                             result.bang_ke_downloaded += 1
                             result.downloaded_files.append(f"📊 {dl_result.filename}")
+                            self._history.add_entry(rule.name, dl_result.filename, "downloaded")
                         elif dl_result.status == DownloadStatus.SKIPPED_DUPLICATE:
                             result.skipped_duplicates += 1
                             result.skipped_files.append(f"📊 {dl_result.filename}")
+                            self._history.add_entry(rule.name, dl_result.filename, "skipped")
                         elif dl_result.status in (
                             DownloadStatus.FAILED,
                             DownloadStatus.FAILED_RETRY_EXHAUSTED,

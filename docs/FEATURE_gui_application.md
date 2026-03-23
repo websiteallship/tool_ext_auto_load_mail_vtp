@@ -15,14 +15,13 @@ Giao diện desktop CustomTkinter — toggle rule, chạy từng rule, preview t
 │  📊 Dashboard                              v2.1          │
 ├──────────────────────────────────────────────────────────┤
 │                                                          │
-│  [▶ Run] [👁️ Preview] [⏹ Stop] [↻ Reset]               │
-│  [📂 Open ▼] [📋 Lịch sử]    ● Ready    Last: 14:30    │
+│  [▶ Run] [⏹ Stop] [↻ Reset] [📂 Open ▼]               │
+│  [📋 Lịch sử]                   ● Ready   Last: 14:30  │
 │                                                          │
-│  Chạy rule: [▶ Tất cả rule đang bật          ▼]         │
+│  Chạy rule: [▶ Tất cả rule đang bật  ▼] [👁️ Preview]   │
 │                                                          │
 │  ┌────────────────────────────────────────────────────┐  │
-│  │ 📊 Thống kê                                        │  │
-│  │ Hôm nay: 12 files  │  Tuần: 45  │  Tổng: 230      │  │
+│  │ 📊 Hôm nay: 12   Tuần: 45   Tổng: 230            │  │
 │  └────────────────────────────────────────────────────┘  │
 │                                                          │
 │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░  70%                         │

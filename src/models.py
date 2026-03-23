@@ -254,3 +254,42 @@ class RunResult:
             f"{len(self.errors)} errors "
             f"({self.duration_seconds:.1f}s)"
         )
+
+
+# ============================================================================
+# Preview Models (v2.1)
+# ============================================================================
+
+@dataclass
+class PreviewItem:
+    """One email found during preview scan."""
+    rule_name: str
+    rule_icon: str
+    email_subject: str
+    email_date: str
+    files: list[str] = field(default_factory=list)
+    file_sources: list[str] = field(default_factory=list)  # "📎" or "🔗"
+
+
+@dataclass
+class PreviewResult:
+    """Result of a dry-run preview scan."""
+    items: list[PreviewItem] = field(default_factory=list)
+    rules_scanned: list[tuple[str, str]] = field(default_factory=list)  # (name, icon)
+    total_emails: int = 0
+    total_files: int = 0
+    duration_seconds: float = 0.0
+    errors: list[str] = field(default_factory=list)
+
+
+# ============================================================================
+# History Models (v2.1)
+# ============================================================================
+
+@dataclass
+class HistoryEntry:
+    """One file download record."""
+    timestamp: str
+    rule_name: str
+    filename: str
+    status: str  # "downloaded" | "skipped" | "error"

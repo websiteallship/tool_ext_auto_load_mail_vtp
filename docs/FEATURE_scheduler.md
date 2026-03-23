@@ -102,6 +102,7 @@ class PreviewItem:
 @dataclass 
 class PreviewResult:
     items: list[PreviewItem]
+    rules_scanned: list[tuple[str, str]]  # (name, icon)
     total_emails: int = 0
     total_files: int = 0
     duration_seconds: float = 0.0

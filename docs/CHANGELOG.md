@@ -5,7 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ---
 
-## [2.1.0] — PLANNED
+## [2.1.0] — 2026-03-23
 
 ### Added
 - 👁️ **Dry-Run Preview** — quét email và hiện danh sách file dự kiến (không tải)
